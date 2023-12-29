@@ -1765,7 +1765,9 @@
 
       scope.coadata = [];
       scope.isTreeView = false;
-      today = new Date();
+      today = `${new Date().getDate()}-${
+        new Date().getMonth() + 1
+      }-${new Date().getFullYear()}`;
       scope.formData = {};
 
       scope.routeTo = function (id) {
@@ -19173,6 +19175,9 @@
             scope.login = function () {
                 scope.authenticationFailed = false;
                 scope.load = true;
+                if(!scope.loginCredentials.otp){
+                    return
+                }
                 authenticationService.authenticateWithUsernamePassword(scope.loginCredentials);
                // delete scope.loginCredentials.password;
             };
