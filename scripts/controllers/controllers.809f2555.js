@@ -25559,25 +25559,21 @@
           scope.loandetails.clientId != null &&
           scope.loandetails.clientId != ""
         ) {
-          location
-            .path("/viewtransactions/" + transactionId)
-            .search({
-              productName: scope.loandetails.loanProductName,
-              loanId: scope.loandetails.id,
-              clientId: scope.loandetails.clientId,
-              accountNo: scope.loandetails.accountNo,
-              clientName: scope.loandetails.clientName,
-            });
+          location.path("/viewtransactions/" + transactionId).search({
+            productName: scope.loandetails.loanProductName,
+            loanId: scope.loandetails.id,
+            clientId: scope.loandetails.clientId,
+            accountNo: scope.loandetails.accountNo,
+            clientName: scope.loandetails.clientName,
+          });
         } else {
-          location
-            .path("/viewtransactions/" + transactionId)
-            .search({
-              productName: scope.loandetails.loanProductName,
-              loanId: scope.loandetails.id,
-              accountNo: scope.loandetails.accountNo,
-              groupId: scope.loandetails.group.id,
-              groupName: scope.loandetails.group.name,
-            });
+          location.path("/viewtransactions/" + transactionId).search({
+            productName: scope.loandetails.loanProductName,
+            loanId: scope.loandetails.id,
+            accountNo: scope.loandetails.accountNo,
+            groupId: scope.loandetails.group.id,
+            groupName: scope.loandetails.group.name,
+          });
         }
       };
 
@@ -27074,12 +27070,10 @@
             exactMatch = true;
           }
         }
-        location
-          .path("/search/" + searchString)
-          .search({
-            exactMatch: exactMatch,
-            resource: scope.currentScope.value,
-          });
+        location.path("/search/" + searchString).search({
+          exactMatch: exactMatch,
+          resource: scope.currentScope.value,
+        });
       };
       scope.text =
         '<span>Mifos X is designed by the <a href="http://www.openmf.org/">Mifos Initiative</a>.' +
@@ -42050,6 +42044,9 @@
       $sce,
       $log
     ) {
+      today = `${new Date().getDate()}-${
+        new Date().getMonth() + 1
+      }-${new Date().getFullYear()}`;
       scope.isCollapsed = false; //displays options div on startup
       scope.hideTable = true; //hides the results div on startup
       scope.hidePentahoReport = true; //hides the results div on startup
@@ -42123,7 +42120,7 @@
         resourceFactory.downloadReport.get({
           reportCode: scope.reportId,
           startDate: "01-01-2023",
-          endDate: "12-12-23",
+          endDate: today,
           keyword: "",
         });
       };
