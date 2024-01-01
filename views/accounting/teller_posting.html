@@ -53,7 +53,7 @@
           <a
             href="#/create_teller"
             class="btn btn-primary"
-            has-permission="CREATE_GLACCOUNT"
+            has-permission="CREATE_TELLER"
             ><i class="fa fa-plus"></i>&nbsp;&nbsp;{{'label.button.addTeller' |
             translate}}</a
           >
@@ -66,7 +66,7 @@
             type="text"
             ng-keyup="onFilter()"
             class="form-control"
-            placeholder="{{'label.input.filterbyAccountGlcodeAccounttype' | translate}}"
+            placeholder=""
           />
         </div>
         <!-- <div class="col-sm-3 paddedbottom10">
@@ -94,7 +94,9 @@
               <th>{{'label.input.sourceAccount' | translate}}</th>
               <th>{{'label.input.amount' | translate}}</th>
               <th>{{'label.input.status' | translate}}</th>
-              <th>{{'label.heading.actions' | translate}}</th>
+              <th has-permission="UPDATE_TELLER">
+                {{'label.heading.actions' | translate}}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -108,7 +110,7 @@
               <td class="pointer">{{coadata.sourceAccount}}</td>
               <td class="pointer">{{coadata.amount}}</td>
               <td class="pointer">{{coadata.status}}</td>
-              <td class="pointer">
+              <td class="pointer" has-permission="UPDATE_TELLER">
                 <span
                   ><a
                     uib-tooltip="Approve"
