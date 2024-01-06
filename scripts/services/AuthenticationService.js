@@ -92,7 +92,7 @@
             .then(getUserDetails)
             .catch(onLoginFailure);
         } else {
-          // httpService.setOTPToken(credentials.otp);
+          httpService.setOTPToken(credentials.otp);
           httpService
             .post(apiVer + "/authentication", {
               username: credentials.username,
