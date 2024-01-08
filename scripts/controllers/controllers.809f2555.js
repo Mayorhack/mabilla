@@ -1376,42 +1376,7 @@
       scope.headerTypes = [];
       scope.tranTypes = [];
 
-      resourceFactory.accountCoaTemplateResource.get(
-        { type: "0" },
-        function (data) {
-          scope.coadata = data;
-          scope.accountTypes = data.accountTypeOptions;
-          scope.usageTypes = data.usageOptions;
-
-          scope.formData = {
-            createdBy: "string",
-            verifiedBy: 0,
-          };
-          scope.formData.type;
-          scope.formData.parentId;
-
-          for (var i = 0; i < data.accountTypeOptions.length; i++) {
-            if (data.accountTypeOptions[i].value == $routeParams.acctype) {
-              console.log(
-                $routeParams.acctype + data.accountTypeOptions[i].value
-              );
-              scope.formData.type = scope.accountTypes[i].id;
-            }
-          }
-
-          //by default display assetTagsOptions and assetHeaderAccountOptions
-          (scope.types = data.allowedAssetsTagOptions),
-            (scope.headerTypes = data.assetHeaderAccountOptions);
-          scope.changeType();
-
-          for (var i = 0; i < scope.headerTypes.length; i++) {
-            if (scope.headerTypes[i].id == $routeParams.parent) {
-              console.log($routeParams.parent + scope.headerTypes[i].id);
-              scope.formData.parentId = scope.headerTypes[i].id;
-            }
-          }
-        }
-      );
+     
       resourceFactory.getTellerTranType.get(function (data) {
         scope.tranTypes = data.listData;
         console.log(tranTypes);
@@ -1437,9 +1402,9 @@
       };
 
       if ($routeParams.parent) {
-        scope.cancel = "#/tellerPosting/" + $routeParams.parent;
+        scope.cancel = "#/teller_posting/" + $routeParams.parent;
       } else {
-        scope.cancel = "#/accounting_coa";
+        scope.cancel = "#/teller_posting";
       }
 
       scope.submit = function () {
