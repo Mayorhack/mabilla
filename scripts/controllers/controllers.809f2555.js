@@ -6369,7 +6369,14 @@
           scope.formData.familyMembers.push(temp);
         }
 
-        //
+        if (this.formData.genderId) {
+          var currentGender = scope.genderOptions.filter(
+            (item) => item.id === this.formData.genderId
+          );
+          if (currentGender.length) {
+            this.formData.gender = currentGender[0].name || "";
+          }
+        }
 
         resourceFactory.clientResource.save(this.formData, function (data) {
           location.path("/viewclient/" + data.clientId);
