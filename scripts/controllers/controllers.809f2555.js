@@ -5870,14 +5870,7 @@
         delete this.formData.unitType;
         delete this.formData.total;
         delete this.formData.totalCollateral;
-        if (this.formData.genderId) {
-          var currentGender = scope.genderOptions.filter(
-            (item) => item.id === this.formData.genderId
-          );
-          if (currentGender.length) {
-            this.formData.gender = currentGender[0].name || "";
-          }
-        }
+
         resourceFactory.clientcollateralResource.save(
           { clientId: scope.clientId },
           this.formData,
@@ -6378,7 +6371,14 @@
           scope.formData.familyMembers.push(temp);
         }
 
-        //
+        if (this.formData.genderId) {
+          var currentGender = scope.genderOptions.filter(
+            (item) => item.id === this.formData.genderId
+          );
+          if (currentGender.length) {
+            this.formData.gender = currentGender[0].name || "";
+          }
+        }
 
         resourceFactory.clientResource.save(this.formData, function (data) {
           location.path("/viewclient/" + data.clientId);
