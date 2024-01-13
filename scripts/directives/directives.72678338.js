@@ -33,7 +33,7 @@ mifosX.ng.application
         require: "?ngmodel",
         link: function (scope, elm, attr, ctrl) {
           var template =
-            '<div uib-alert type="danger" ng-show="errorStatus || errorDetails.length > 0">' +
+            '<div uib-alert type="danger" ng-show="errorStatus || errorDetails.length > 0 || errorMsg">' +
             '<div ng-repeat="errorArray in errorDetails">' +
             '<label><i class="fa fa-exclamation-circle"></i>' +
             "{{" +
