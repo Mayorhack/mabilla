@@ -1051,7 +1051,7 @@
   "label.heading.financial.activity.type": "Financial Activity",
   "label.heading.financial.activity.account.name": "Account Name",
   "label.heading.transferredfrom": "Transferred From",
-  "label.heading.createteller": "Create Teller",
+  "label.heading.createteller": "Cash Transaction Posting",
   "label.heading.createdon": "Created On",
   "label.heading.journalentry.created": "Journal Entry Created",
   "label.heading.viewreport": "View Report",
