@@ -2751,7 +2751,7 @@
   "#Inputs": "..",
 
   "label.input.date": "Date",
-  "label.input.transRefNo": "Trans. Ref",
+  "label.input.tranRefNo": "Trans. Ref",
   "label.input.transType": "Trans. Type",
   "label.input.beneficiaryAccount": "Beneficiary Account",
   "label.input.beneficiaryName": "Beneficiary Name",
