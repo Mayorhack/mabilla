@@ -1368,6 +1368,7 @@
       scope,
       resourceFactory,
       location,
+      dateFilter,
       $routeParams
     ) {
       scope.coadata = [];
@@ -1377,8 +1378,17 @@
       scope.tranTypes = [];
 
       resourceFactory.getTellerTranType.get(function (data) {
-        scope.tranTypes = data.listData;
-        console.log(tranTypes);
+        var userPermissions = JSON.parse(
+          localStorage.getItem("sessionData")
+        ).userPermissions;
+
+        scope.tranTypes =
+          userPermissions.includes("UPDATE_TELLER") ||
+          userPermissions.includes("ALL_FUNCTIONS")
+            ? data.listData
+            : data.listData.filter((item) => {
+                return item.code === "CADP" || item.code === "CAWD";
+              });
       });
 
       scope.changeType = function () {
@@ -1407,10 +1417,24 @@
       }
 
       scope.submit = function () {
+        let transactionDate;
+        if (this.formData.transactionDate) {
+          transactionDate = dateFilter(
+            new Date(this.formData.transactionDate),
+            "dd-MM-yyyy"
+          );
+        }
         resourceFactory.saveTellerPostingResource.create(
-          this.formData,
+          {
+            ...this.formData,
+            tranCode: this.formData.tranType,
+            transactionDate,
+          },
           function () {
-            location.path("/teller_posting");
+            if (data.responseCode === "000") location.path("/teller_posting");
+            else {
+              scope.errorMsg = data.responseMessage;
+            }
           }
         );
       };
@@ -1424,9 +1448,6 @@
           function (data) {
             // location.path("/viewglaccount/" + data.resourceId);
             scope.formData.beneficiaryName = data.name;
-            console.log(this.formData);
-
-            console.log(data.name);
           }
         );
       };
@@ -1437,6 +1458,7 @@
       "$scope",
       "ResourceFactory",
       "$location",
+      "dateFilter",
       "$routeParams",
       mifosX.controllers.CreateTellerPostingController,
     ])
@@ -2322,6 +2344,11 @@
               ...scope.formData,
             },
             function (data) {
+              if (data.responseCode != "000" || data.responseCode != "00") {
+                scope.errorMsg = data.responseMessage;
+                $uibModalInstance.close("activate");
+                return;
+              }
               resourceFactory.tellerPostingResource.getAllAccountCoas(
                 { endDate: today },
                 function (data) {
@@ -42090,9 +42117,7 @@
       scope.downloadReport = function () {
         resourceFactory.downloadReport.get({
           reportCode: scope.reportId,
-          startDate: "01-01-2023",
-          endDate: today,
-          keyword: "",
+          ...scope.formData,
         });
       };
       if (scope.reportType == "Pentaho") {

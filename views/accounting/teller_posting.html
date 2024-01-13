@@ -66,7 +66,7 @@
             type="text"
             ng-keyup="onFilter()"
             class="form-control"
-            placeholder=""
+            placeholder="{{'label.input.filterbyAccountGlcodeAccounttype' | translate}}"
           />
         </div>
         <!-- <div class="col-sm-3 paddedbottom10">
@@ -88,15 +88,15 @@
         <table class="table">
           <thead>
             <tr class="graybg">
-              <th>{{'label.input.tellerId' | translate}}</th>
-              <th>{{'label.input.beneficiaryAccount' | translate}}</th>
-              <th>{{'label.input.beneficiaryName' | translate}}</th>
+              <th>{{'label.input.tranRefNo' | translate}}</th>
+              <th>{{'label.input.date' | translate}}</th>
+              <th>{{'label.input.sourceName' | translate}}</th>
               <th>{{'label.input.sourceAccount' | translate}}</th>
+              <!-- <th>{{'label.input.beneficiaryAccount' | translate}}</th>
+              <th>{{'label.input.beneficiaryName' | translate}}</th> -->
               <th>{{'label.input.amount' | translate}}</th>
               <th>{{'label.input.status' | translate}}</th>
-              <th has-permission="UPDATE_TELLER">
-                {{'label.heading.actions' | translate}}
-              </th>
+              <th>{{'label.heading.actions' | translate}}</th>
             </tr>
           </thead>
           <tbody>
@@ -104,10 +104,11 @@
               class="pointer-main"
               dir-paginate="coadata in coadatas | orderBy:['type.value','glCode']| SearchFilter:filterText |  itemsPerPage: ChartsPerPage"
             >
-              <td class="pointer">{{coadata.tellerId}}</td>
-              <td class="pointer">{{coadata.beneficiaryAccount}}</td>
-              <td class="pointer">{{coadata.beneficiaryAccountName}}</td>
+              <td class="pointer">{{coadata.tranRefNo}}</td>
+              <td class="pointer">{{coadata.transactionDate}}</td>
+              <td class="pointer">{{coadata.sourceAccountName}}</td>
               <td class="pointer">{{coadata.sourceAccount}}</td>
+
               <td class="pointer">{{coadata.amount}}</td>
               <td class="pointer">{{coadata.status}}</td>
               <td class="pointer" has-permission="UPDATE_TELLER">
