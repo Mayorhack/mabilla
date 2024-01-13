@@ -1430,7 +1430,7 @@
             tranCode: this.formData.tranType,
             transactionDate,
           },
-          function () {
+          function (data) {
             if (data.responseCode === "000") location.path("/teller_posting");
             else {
               scope.errorMsg = data.responseMessage;
@@ -2344,22 +2344,23 @@
               ...scope.formData,
             },
             function (data) {
-              if (data.responseCode != "000" || data.responseCode != "00") {
-                scope.errorMsg = data.responseMessage;
+              if (data.responseCode === "000" || data.responseCode === "00") {
+                resourceFactory.tellerPostingResource.getAllAccountCoas(
+                  { endDate: today },
+                  function (data) {
+                    scope.coadatas = data.transactionResponseList;
+                  }
+                );
                 $uibModalInstance.close("activate");
+                $uibModal.open({
+                  templateUrl: "success.html",
+                  controller: SuccessModalInstanceCtrl,
+                });
                 return;
               }
-              resourceFactory.tellerPostingResource.getAllAccountCoas(
-                { endDate: today },
-                function (data) {
-                  scope.coadatas = data.transactionResponseList;
-                }
-              );
+
+              scope.errorMsg = data.responseMessage;
               $uibModalInstance.close("activate");
-              $uibModal.open({
-                templateUrl: "success.html",
-                controller: SuccessModalInstanceCtrl,
-              });
             }
           );
         };
