@@ -1368,6 +1368,7 @@
       scope,
       resourceFactory,
       location,
+      dateFilter,
       $routeParams
     ) {
       scope.coadata = [];
@@ -1410,16 +1411,30 @@
       };
 
       if ($routeParams.parent) {
-        scope.cancel = "#/tellerPosting/" + $routeParams.parent;
+        scope.cancel = "#/teller_posting/" + $routeParams.parent;
       } else {
-        scope.cancel = "#/tellerPosting";
+        scope.cancel = "#/teller_posting";
       }
 
       scope.submit = function () {
+        let transactionDate;
+        if (this.formData.transactionDate) {
+          transactionDate = dateFilter(
+            new Date(this.formData.transactionDate),
+            "dd-MM-yyyy"
+          );
+        }
         resourceFactory.saveTellerPostingResource.create(
-          { ...this.formData, tranCode: this.formData.tranType },
+          {
+            ...this.formData,
+            tranCode: this.formData.tranType,
+            transactionDate,
+          },
           function () {
-            location.path("/teller_posting");
+            if (data.responseCode === "000") location.path("/teller_posting");
+            else {
+              scope.errorMsg = data.responseMessage;
+            }
           }
         );
       };
@@ -1431,6 +1446,7 @@
             finEntityType: "INTERNAL",
           },
           function (data) {
+            // location.path("/viewglaccount/" + data.resourceId);
             scope.formData.beneficiaryName = data.name;
           }
         );
@@ -1442,6 +1458,7 @@
       "$scope",
       "ResourceFactory",
       "$location",
+      "dateFilter",
       "$routeParams",
       mifosX.controllers.CreateTellerPostingController,
     ])
@@ -2282,7 +2299,9 @@
 
       scope.coadata = [];
       scope.isTreeView = false;
-      today = new Date();
+      today = `${new Date().getDate()}-${
+        new Date().getMonth() + 1
+      }-${new Date().getFullYear()}`;
       scope.formData = {};
 
       scope.routeTo = function (id) {
@@ -2325,6 +2344,11 @@
               ...scope.formData,
             },
             function (data) {
+              if (data.responseCode != "000" || data.responseCode != "00") {
+                scope.errorMsg = data.responseMessage;
+                $uibModalInstance.close("activate");
+                return;
+              }
               resourceFactory.tellerPostingResource.getAllAccountCoas(
                 { endDate: today },
                 function (data) {
@@ -42018,6 +42042,9 @@
       $sce,
       $log
     ) {
+      today = `${new Date().getDate()}-${
+        new Date().getMonth() + 1
+      }-${new Date().getFullYear()}`;
       scope.isCollapsed = false; //displays options div on startup
       scope.hideTable = true; //hides the results div on startup
       scope.hidePentahoReport = true; //hides the results div on startup

@@ -2750,8 +2750,12 @@
   "label.anchor.fieldconfiguration": "Entity Field Configuration",
   "#Inputs": "..",
 
+  "label.input.date": "Date",
+  "label.input.tranRefNo": "Trans. Ref",
+  "label.input.transType": "Trans. Type",
   "label.input.beneficiaryAccount": "Beneficiary Account",
   "label.input.beneficiaryName": "Beneficiary Name",
+  "label.input.sourceName": "Source Acc. Name",
   "label.input.narration": "Narration",
   "label.input.slipNumber": "Slip Number",
   "label.input.sourceAccount": "Source Account",
