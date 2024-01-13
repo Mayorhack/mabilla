@@ -23,6 +23,31 @@
 
       <div class="form-group">
         <label class="control-label col-sm-2"
+          >{{'label.input.tranType' | translate}}<span class="required"
+            >*</span
+          ></label
+        >
+        <div class="col-sm-3">
+          <select
+            chosen="tranTypes"
+            id="tranType"
+            ng-model="formData.tranType"
+            class="form-control"
+            ng-options="tranType.code as tranType.name for tranType in tranTypes"
+            value="{{tranType.code}}"
+          >
+            <option class="displaynone" value="">
+              {{'label.input.tranType' | translate}}
+            </option>
+          </select>
+        </div>
+        <div class="col-sm-1">
+          <form-validate
+            valattributeform="createglaccountingform"
+            valattribute="tranType"
+          />
+        </div>
+        <label class="control-label col-sm-2"
           >{{'label.input.tellerId' | translate}}<span class="required"
             >*</span
           ></label
@@ -45,30 +70,8 @@
             valattribute="tellerId"
           />
         </div>
-        <label class="control-label col-sm-2"
-          >{{'label.input.slipNumber' | translate}}<span class="required"
-            >*</span
-          ></label
-        >
-        <div class="col-sm-3">
-          <input
-            id="slipNumber"
-            type="text"
-            name="slipNumber"
-            ng-model="formData.slipNumber"
-            class="form-control"
-            required
-            late-Validate
-          />
-        </div>
-        <div class="col-sm-1">
-          <form-validate
-            valattributeform="createglaccountingform"
-            valattribute="slipNumber"
-          />
-        </div>
       </div>
-      <div class="form-group">
+      <div class="form-group" hidden>
         <label class="control-label col-sm-2"
           >{{'label.input.beneficiaryAccount' | translate}}<span
             class="required"
@@ -84,7 +87,6 @@
             ng-model="formData.beneficiaryAccount"
             class="form-control"
             ng-blur="fetchAccount()"
-            required
             late-Validate
           />
         </div>
@@ -107,7 +109,6 @@
             name="beneficiaryName"
             ng-model="formData.beneficiaryName"
             class="form-control"
-            required
             late-Validate
             disabled
           />
@@ -166,8 +167,54 @@
           />
         </div>
       </div>
-
       <div class="form-group">
+        <label class="control-label col-sm-2"
+          >{{'label.input.slipNumber' | translate}}<span class="required"
+            >*</span
+          ></label
+        >
+        <div class="col-sm-3">
+          <input
+            id="slipNumber"
+            type="text"
+            name="slipNumber"
+            ng-model="formData.slipNumber"
+            class="form-control"
+            required
+            late-Validate
+          />
+        </div>
+        <div class="col-sm-1">
+          <form-validate
+            valattributeform="createglaccountingform"
+            valattribute="slipNumber"
+          />
+        </div>
+        <label class="control-label col-sm-2"
+          >Transaction Date<span class="required"></span
+        ></label>
+        <div class="col-sm-3">
+          <input
+            id="transactionDate"
+            type="text"
+            name="transactionDate"
+            datepicker-pop="dd MMMM yyyy"
+            ng-model="formData.transactionDate"
+            is-open="opened1"
+            min="minDate"
+            max="restrictDate"
+            class="form-control"
+          />
+        </div>
+        <div class="col-sm-1">
+          <form-validate
+            valattributeform="createglaccountingform"
+            valattribute="transactionDate"
+          />
+        </div>
+      </div>
+
+      <!-- <div class="form-group">
         <label class="control-label col-sm-2"
           >{{'label.input.tranCode' | translate}}<span class="required"
             >*</span
@@ -213,41 +260,8 @@
             valattribute="vaultNo"
           />
         </div>
-      </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2"
-          >{{'label.input.tranType' | translate}}<span class="required"
-            >*</span
-          ></label
-        >
-        <div class="col-sm-3">
-          <select
-            chosen="tranTypes"
-            id="tranType"
-            ng-model="formData.tranType"
-            class="form-control"
-            ng-options="tranType.code as tranType.name for tranType in tranTypes"
-            value="{{tranType.code}}"
-          >
-            <option class="displaynone" value="">
-              {{'label.input.tranType' | translate}}
-            </option>
-          </select>
-        </div>
-        <div class="col-sm-1">
-          <form-validate
-            valattributeform="createglaccountingform"
-            valattribute="tranType"
-          />
-        </div>
+      </div> -->
 
-        <div class="col-sm-1">
-          <form-validate
-            valattributeform="createglaccountingform"
-            valattribute="vaultNo"
-          />
-        </div>
-      </div>
       <div class="form-group">
         <label class="control-label col-sm-2" for="narration"
           >{{'label.input.narration' | translate}}</label

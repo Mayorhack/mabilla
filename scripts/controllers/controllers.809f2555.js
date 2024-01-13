@@ -1377,8 +1377,17 @@
       scope.tranTypes = [];
 
       resourceFactory.getTellerTranType.get(function (data) {
-        scope.tranTypes = data.listData;
-        console.log(tranTypes);
+        var userPermissions = JSON.parse(
+          localStorage.getItem("sessionData")
+        ).userPermissions;
+
+        scope.tranTypes =
+          userPermissions.includes("UPDATE_TELLER") ||
+          userPermissions.includes("ALL_FUNCTIONS")
+            ? data.listData
+            : data.listData.filter((item) => {
+                return item.code === "CADP" || item.code === "CAWD";
+              });
       });
 
       scope.changeType = function () {
@@ -1408,7 +1417,7 @@
 
       scope.submit = function () {
         resourceFactory.saveTellerPostingResource.create(
-          this.formData,
+          { ...this.formData, tranCode: this.formData.tranType },
           function () {
             location.path("/teller_posting");
           }
@@ -1422,11 +1431,7 @@
             finEntityType: "INTERNAL",
           },
           function (data) {
-            // location.path("/viewglaccount/" + data.resourceId);
             scope.formData.beneficiaryName = data.name;
-            console.log(this.formData);
-
-            console.log(data.name);
           }
         );
       };
@@ -42085,9 +42090,7 @@
       scope.downloadReport = function () {
         resourceFactory.downloadReport.get({
           reportCode: scope.reportId,
-          startDate: "01-01-2023",
-          endDate: "12-12-23",
-          keyword: "",
+          ...scope.formData,
         });
       };
       if (scope.reportType == "Pentaho") {
