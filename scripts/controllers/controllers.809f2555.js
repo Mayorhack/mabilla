@@ -1441,13 +1441,16 @@
       scope.fetchAccount = function () {
         resourceFactory.accountLookupResource.get(
           {
-            accountNumber: scope.formData.beneficiaryAccount,
+            accountNumber: scope.formData.sourceAccount,
             finEntityCode: "MIFOS",
             finEntityType: "INTERNAL",
           },
           function (data) {
-            // location.path("/viewglaccount/" + data.resourceId);
-            scope.formData.beneficiaryName = data.name;
+            if (data.responseCode == "000") {
+              scope.formData.accountName = data.name;
+            } else {
+              scope.errorMsg = data.responseMessage;
+            }
           }
         );
       };
@@ -2344,6 +2347,8 @@
               ...scope.formData,
             },
             function (data) {
+          
+              
               if (data.responseCode === "000" || data.responseCode === "00") {
                 resourceFactory.tellerPostingResource.getAllAccountCoas(
                   { endDate: today },
@@ -2356,11 +2361,12 @@
                   templateUrl: "success.html",
                   controller: SuccessModalInstanceCtrl,
                 });
-                return;
+                return
               }
-
+              
               scope.errorMsg = data.responseMessage;
               $uibModalInstance.close("activate");
+              
             }
           );
         };
