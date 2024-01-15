@@ -2753,6 +2753,7 @@
   "label.input.date": "Date",
   "label.input.tranRefNo": "Trans. Ref",
   "label.input.transType": "Trans. Type",
+  "label.input.accountName": "Account Name",
   "label.input.beneficiaryAccount": "Beneficiary Account",
   "label.input.beneficiaryName": "Beneficiary Name",
   "label.input.sourceName": "Source Acc. Name",
