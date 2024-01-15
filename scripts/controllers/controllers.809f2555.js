@@ -1441,13 +1441,16 @@
       scope.fetchAccount = function () {
         resourceFactory.accountLookupResource.get(
           {
-            accountNumber: scope.formData.beneficiaryAccount,
+            accountNumber: scope.formData.sourceAccount,
             finEntityCode: "MIFOS",
             finEntityType: "INTERNAL",
           },
           function (data) {
-            // location.path("/viewglaccount/" + data.resourceId);
-            scope.formData.beneficiaryName = data.name;
+            if (data.responseCode == "000") {
+              scope.formData.accountName = data.name;
+            } else {
+              scope.errorMsg = data.responseMessage;
+            }
           }
         );
       };
