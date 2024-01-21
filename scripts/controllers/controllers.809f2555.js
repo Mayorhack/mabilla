@@ -2347,8 +2347,6 @@
               ...scope.formData,
             },
             function (data) {
-          
-              
               if (data.responseCode === "000" || data.responseCode === "00") {
                 resourceFactory.tellerPostingResource.getAllAccountCoas(
                   { endDate: today },
@@ -2361,12 +2359,11 @@
                   templateUrl: "success.html",
                   controller: SuccessModalInstanceCtrl,
                 });
-                return
+                return;
               }
-              
+
               scope.errorMsg = data.responseMessage;
               $uibModalInstance.close("activate");
-              
             }
           );
         };
@@ -42122,10 +42119,45 @@
         }
       );
       scope.downloadReport = function () {
-        resourceFactory.downloadReport.get({
+        const url = window.location.search;
+        const queryParams = new URLSearchParams(url);
+        const tenant = queryParams.get("tenantIdentifier");
+        const baseUrl = queryParams.get("baseApiUrl");
+        const params = new URLSearchParams({
           reportCode: scope.reportId,
           ...scope.formData,
         });
+        var myHeaders = new Headers();
+        var auth = JSON.parse(
+          localStorage.getItem("sessionData")
+        ).authenticationKey;
+        myHeaders.append("Authorization", `Basic ${auth}`);
+        myHeaders.append("Fineract-Platform-Tenantid", tenant);
+
+        var requestOptions = {
+          method: "GET",
+
+          headers: myHeaders,
+          responseType: "blob",
+          redirect: "follow",
+        };
+        fetch(
+          baseUrl +
+            "/fineract-provider/api/v1" +
+            "/thirdparty/downloadReport?" +
+            params,
+          requestOptions
+        )
+          .then((response) => response.blob())
+          .then((blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "Report.xlsx";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          });
       };
       if (scope.reportType == "Pentaho") {
         resourceFactory.reportsResource.get(
