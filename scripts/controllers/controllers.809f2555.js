@@ -1364,6 +1364,100 @@
 })(mifosX.controllers || {});
 (function (module) {
   mifosX.controllers = _.extend(module, {
+    BulkImportTellerPostingController: function (
+      scope,
+      resourceFactory,
+      location,
+      API_VERSION,
+      $rootScope,
+      Upload
+    ) {
+      scope.first = {};
+      scope.first.templateUrl = "../../../images/bulktellerTemp.csv";
+      scope.formData = {};
+      var requestParams = { staffInSelectedOfficeOnly: true };
+
+      resourceFactory.clientTemplateResource.get(
+        requestParams,
+        function (data) {
+          scope.offices = data.officeOptions;
+          scope.staffs = data.staffOptions;
+        }
+      );
+
+      scope.first.queryParams = "&";
+      scope.changeOffice = function () {
+        if (scope.formData.officeId) {
+          if (scope.first.queryParams.indexOf("officeId") == -1) {
+            scope.first.queryParams += "officeId=" + scope.formData.officeId;
+          } else {
+            scope.first.queryParams = scope.first.queryParams.replace(
+              /&officeId=\d+/i,
+              "&officeId=" + scope.formData.officeId
+            );
+          }
+        } else {
+          scope.first.queryParams = "&";
+        }
+      };
+
+      scope.onFileSelect = function (files) {
+        scope.formData.file = files[0];
+      };
+      scope.refreshImportTable = function () {
+        resourceFactory.importResource.getImports(
+          { entityType: "gljournalentries" },
+          function (data) {
+            for (var l in data) {
+              var importdocs = {};
+              importdocs =
+                API_VERSION +
+                "/imports/downloadOutputTemplate?importDocumentId=" +
+                data[l].importId +
+                "&tenantIdentifier=" +
+                $rootScope.tenantIdentifier;
+              data[l].docUrl = importdocs;
+            }
+            scope.imports = data;
+          }
+        );
+      };
+
+      scope.upload = function () {
+        Upload.upload({
+          url: $rootScope.hostUrl + API_VERSION + "/tellerposting/upload",
+          data: {
+            file: scope.formData.file,
+            // locale: scope.optlang.code,
+            // dateFormat: scope.df,
+            name: "teller" + new Date().getTime(),
+          },
+        }).then(function (data) {
+          location.path("/viewtellers/" + data.resourceId);
+          // to fix IE not refreshing the model
+          if (!scope.$$phase) {
+            scope.$apply();
+          }
+        });
+      };
+    },
+  });
+  mifosX.ng.application
+    .controller("BulkImportTellerPostingController", [
+      "$scope",
+      "ResourceFactory",
+      "$location",
+      "API_VERSION",
+      "$rootScope",
+      "Upload",
+      mifosX.controllers.BulkImportTellerPostingController,
+    ])
+    .run(function ($log) {
+      $log.info("BulkImportTellerPostingController initialized");
+    });
+})(mifosX.controllers || {});
+(function (module) {
+  mifosX.controllers = _.extend(module, {
     CreateTellerPostingController: function (
       scope,
       resourceFactory,
@@ -1376,6 +1470,7 @@
       scope.usageTypes = [];
       scope.headerTypes = [];
       scope.tranTypes = [];
+      scope.errorDetails = [];
 
       resourceFactory.getTellerTranType.get(function (data) {
         var userPermissions = JSON.parse(
@@ -1410,10 +1505,10 @@
         }
       };
 
-      if ($routeParams.parent) {
-        scope.cancel = "#/teller_posting/" + $routeParams.parent;
+      if ($routeParams?.parent) {
+        scope.cancel = "#/tellerPosting/" + $routeParams.parent;
       } else {
-        scope.cancel = "#/teller_posting";
+        scope.cancel = "#/tellerPosting";
       }
 
       scope.submit = function () {
@@ -1431,6 +1526,7 @@
             transactionDate,
           },
           function (data) {
+            console.log(data);
             if (data.responseCode === "000") location.path("/teller_posting");
             else {
               scope.errorMsg = data.responseMessage;
@@ -2347,23 +2443,22 @@
               ...scope.formData,
             },
             function (data) {
-              if (data.responseCode === "000" || data.responseCode === "00") {
-                resourceFactory.tellerPostingResource.getAllAccountCoas(
-                  { endDate: today },
-                  function (data) {
-                    scope.coadatas = data.transactionResponseList;
-                  }
-                );
+              if (data.responseCode != "000" || data.responseCode != "00") {
+                scope.errorMsg = data.responseMessage;
                 $uibModalInstance.close("activate");
-                $uibModal.open({
-                  templateUrl: "success.html",
-                  controller: SuccessModalInstanceCtrl,
-                });
                 return;
               }
-
-              scope.errorMsg = data.responseMessage;
+              resourceFactory.tellerPostingResource.getAllAccountCoas(
+                { endDate: today },
+                function (data) {
+                  scope.coadatas = data.transactionResponseList;
+                }
+              );
               $uibModalInstance.close("activate");
+              $uibModal.open({
+                templateUrl: "success.html",
+                controller: SuccessModalInstanceCtrl,
+              });
             }
           );
         };
@@ -6190,7 +6285,6 @@
 
       scope.submit = function () {
         var reqDate = dateFilter(scope.first.date, scope.df);
-
         this.formData.locale = scope.optlang.code;
         this.formData.active = this.formData.active || false;
         this.formData.dateFormat = scope.df;
@@ -6401,7 +6495,6 @@
           temp.dateFormat = scope.df;
           scope.formData.familyMembers.push(temp);
         }
-
         if (this.formData.genderId) {
           var currentGender = scope.genderOptions.filter(
             (item) => item.id === this.formData.genderId
@@ -6410,6 +6503,8 @@
             this.formData.gender = currentGender[0].name || "";
           }
         }
+
+        //
 
         resourceFactory.clientResource.save(this.formData, function (data) {
           location.path("/viewclient/" + data.clientId);
@@ -7280,12 +7375,12 @@
         }
 
         /* resourceFactory.getAllFamilyMembers.get({clientId:routeParams.id},function(data)
-                {
+              {
 
-                    scope.families=data;
+                  scope.families=data;
 
 
-                })*/
+              })*/
       });
 
       scope.routeTo = function () {
@@ -12308,46 +12403,46 @@
           scope.actionName = "Approve application";
           break;
         /*case "deposit":
-                 resourceFactory.savingsTrxnsTemplateResource.get({savingsId:scope.accountId, command:'deposit'}, function (data) {
-                 scope.paymentTypes=data.paymentTypeOptions;
-                 });
-                 scope.title = 'label.heading.depositmoneytosavingaccount';
-                 scope.labelName = 'label.input.transactiondate';
-                 scope.modelName = 'transactionDate';
-                 scope.showDateField = true;
-                 scope.showNoteField = false;
-                 scope.isTransaction = true;
-                 scope.showPaymentDetails = false;
-                 break;
-                 case "withdrawal":
-                 resourceFactory.savingsTrxnsTemplateResource.get({savingsId:scope.accountId, command:'withdrawal'}, function (data) {
-                 scope.paymentTypes=data.paymentTypeOptions;
-                 });
-                 scope.title = 'label.heading.withdrawmoneyfromsavingaccount';
-                 scope.labelName = 'label.input.transactiondate';
-                 scope.modelName = 'transactionDate';
-                 scope.showDateField = true;
-                 scope.showNoteField = false;
-                 scope.isTransaction = true;
-                 scope.showPaymentDetails = false;
-                 break;
-                 case "applyAnnualFees":
-                 resourceFactory.savingsResource.get({accountId : routeParams.id, resourceType : 'charges', chargeId : routeParams.chargeId},
-                 function (data) {
-                 scope.formData.amount = data.amount;
-                 if (data.dueDate) {
-                 var dueDate = dateFilter(data.dueDate, scope.df);
-                 scope.formData.dueDate = new Date(dueDate);
-                 }
-                 });
-                 scope.title = 'label.heading.savingaccountapplyannualFee';
-                 scope.labelName = 'label.input.annualfeetransactiondate';
-                 scope.modelName = 'dueDate';
-                 scope.showDateField = true;
-                 scope.showAnnualAmountField = true;
-                 scope.showAmountField = false;
-                 scope.showNoteField = false;
-                 break;*/
+               resourceFactory.savingsTrxnsTemplateResource.get({savingsId:scope.accountId, command:'deposit'}, function (data) {
+               scope.paymentTypes=data.paymentTypeOptions;
+               });
+               scope.title = 'label.heading.depositmoneytosavingaccount';
+               scope.labelName = 'label.input.transactiondate';
+               scope.modelName = 'transactionDate';
+               scope.showDateField = true;
+               scope.showNoteField = false;
+               scope.isTransaction = true;
+               scope.showPaymentDetails = false;
+               break;
+               case "withdrawal":
+               resourceFactory.savingsTrxnsTemplateResource.get({savingsId:scope.accountId, command:'withdrawal'}, function (data) {
+               scope.paymentTypes=data.paymentTypeOptions;
+               });
+               scope.title = 'label.heading.withdrawmoneyfromsavingaccount';
+               scope.labelName = 'label.input.transactiondate';
+               scope.modelName = 'transactionDate';
+               scope.showDateField = true;
+               scope.showNoteField = false;
+               scope.isTransaction = true;
+               scope.showPaymentDetails = false;
+               break;
+               case "applyAnnualFees":
+               resourceFactory.savingsResource.get({accountId : routeParams.id, resourceType : 'charges', chargeId : routeParams.chargeId},
+               function (data) {
+               scope.formData.amount = data.amount;
+               if (data.dueDate) {
+               var dueDate = dateFilter(data.dueDate, scope.df);
+               scope.formData.dueDate = new Date(dueDate);
+               }
+               });
+               scope.title = 'label.heading.savingaccountapplyannualFee';
+               scope.labelName = 'label.input.annualfeetransactiondate';
+               scope.modelName = 'dueDate';
+               scope.showDateField = true;
+               scope.showAnnualAmountField = true;
+               scope.showAmountField = false;
+               scope.showNoteField = false;
+               break;*/
         case "close":
           resourceFactory.fixedDepositAccountResource.get(
             {
@@ -12605,10 +12700,10 @@
               );
             }
             /*} else if (scope.action == "applyAnnualFees" || scope.action == "paycharge" || scope.action == "waivecharge") {
-                         params = {accountId : routeParams.id, resourceType : 'charges', chargeId : routeParams.chargeId, command : 'paycharge'};
-                         if (this.formData.dueDate) {
-                         this.formData.dueDate = dateFilter(this.formData.dueDate,scope.df);
-                         }*/
+                       params = {accountId : routeParams.id, resourceType : 'charges', chargeId : routeParams.chargeId, command : 'paycharge'};
+                       if (this.formData.dueDate) {
+                       this.formData.dueDate = dateFilter(this.formData.dueDate,scope.df);
+                       }*/
           } else if (scope.action === "close") {
             if (this.formData.closedOnDate) {
               this.formData.closedOnDate = dateFilter(
@@ -12761,13 +12856,13 @@
             );
             break;
           /*          case "applyAnnualFees":
-                     location.path('/savingaccountcharge/' + accountId + '/applyAnnualFees/' + scope.annualChargeId);
-                     break;
-                     case "transferFunds":
-                     if (scope.savingaccountdetails.clientId) {
-                     location.path('/accounttransfers/fromsavings/'+accountId);
-                     }
-                     break;*/
+                   location.path('/savingaccountcharge/' + accountId + '/applyAnnualFees/' + scope.annualChargeId);
+                   break;
+                   case "transferFunds":
+                   if (scope.savingaccountdetails.clientId) {
+                   location.path('/accounttransfers/fromsavings/'+accountId);
+                   }
+                   break;*/
           case "close":
             location.path("/fixeddepositaccount/" + accountId + "/close");
             break;
@@ -12931,10 +13026,10 @@
               }
             }
             /*if (data.clientId) {
-                     scope.buttons.options.push({
-                     name:"button.transferFunds"
-                     });
-                     }*/
+                   scope.buttons.options.push({
+                   name:"button.transferFunds"
+                   });
+                   }*/
           } else if (data.status.value == "Matured") {
             scope.buttons = {
               singlebuttons: [
@@ -12957,10 +13052,10 @@
               ],
             };
             /*if (data.clientId) {
-                     scope.buttons.options.push({
-                     name:"button.transferFunds"
-                     });
-                     }*/
+                   scope.buttons.options.push({
+                   name:"button.transferFunds"
+                   });
+                   }*/
           }
 
           resourceFactory.standingInstructionTemplateResource.get(
@@ -15098,10 +15193,10 @@
               );
             }
             /*} else if (scope.action == "applyAnnualFees" || scope.action == "paycharge" || scope.action == "waivecharge") {
-                         params = {accountId : routeParams.id, resourceType : 'charges', chargeId : routeParams.chargeId, command : 'paycharge'};
-                         if (this.formData.dueDate) {
-                         this.formData.dueDate = dateFilter(this.formData.dueDate,scope.df);
-                         }*/
+                       params = {accountId : routeParams.id, resourceType : 'charges', chargeId : routeParams.chargeId, command : 'paycharge'};
+                       if (this.formData.dueDate) {
+                       this.formData.dueDate = dateFilter(this.formData.dueDate,scope.df);
+                       }*/
           } else if (scope.action === "close") {
             if (this.formData.closedOnDate) {
               this.formData.closedOnDate = dateFilter(
@@ -15264,13 +15359,13 @@
             );
             break;
           /*case "applyAnnualFees":
-                        location.path('/savingaccountcharge/' + accountId + '/applyAnnualFees/' + scope.annualChargeId);
-                        break;
-                    case "transferFunds":
-                        if (scope.savingaccountdetails.clientId) {
-                            location.path('/accounttransfers/fromsavings/' + accountId);
-                        }
-                        break;*/
+                      location.path('/savingaccountcharge/' + accountId + '/applyAnnualFees/' + scope.annualChargeId);
+                      break;
+                  case "transferFunds":
+                      if (scope.savingaccountdetails.clientId) {
+                          location.path('/accounttransfers/fromsavings/' + accountId);
+                      }
+                      break;*/
           case "close":
             location.path("/recurringdepositaccount/" + accountId + "/close");
             break;
@@ -15489,9 +15584,9 @@
           }
 
           /*var annualdueDate = [];
-                 annualdueDate = data.annualFee.feeOnMonthDay;
-                 annualdueDate.push(2013);
-                 scope.annualdueDate = new Date(annualdueDate);*/
+               annualdueDate = data.annualFee.feeOnMonthDay;
+               annualdueDate.push(2013);
+               scope.annualdueDate = new Date(annualdueDate);*/
           resourceFactory.standingInstructionTemplateResource.get(
             {
               fromClientId: scope.savingaccountdetails.clientId,
@@ -25561,21 +25656,25 @@
           scope.loandetails.clientId != null &&
           scope.loandetails.clientId != ""
         ) {
-          location.path("/viewtransactions/" + transactionId).search({
-            productName: scope.loandetails.loanProductName,
-            loanId: scope.loandetails.id,
-            clientId: scope.loandetails.clientId,
-            accountNo: scope.loandetails.accountNo,
-            clientName: scope.loandetails.clientName,
-          });
+          location
+            .path("/viewtransactions/" + transactionId)
+            .search({
+              productName: scope.loandetails.loanProductName,
+              loanId: scope.loandetails.id,
+              clientId: scope.loandetails.clientId,
+              accountNo: scope.loandetails.accountNo,
+              clientName: scope.loandetails.clientName,
+            });
         } else {
-          location.path("/viewtransactions/" + transactionId).search({
-            productName: scope.loandetails.loanProductName,
-            loanId: scope.loandetails.id,
-            accountNo: scope.loandetails.accountNo,
-            groupId: scope.loandetails.group.id,
-            groupName: scope.loandetails.group.name,
-          });
+          location
+            .path("/viewtransactions/" + transactionId)
+            .search({
+              productName: scope.loandetails.loanProductName,
+              loanId: scope.loandetails.id,
+              accountNo: scope.loandetails.accountNo,
+              groupId: scope.loandetails.group.id,
+              groupName: scope.loandetails.group.name,
+            });
         }
       };
 
@@ -26663,9 +26762,6 @@
       scope.twofactorRememberMe = false;
 
       scope.login = function () {
-        if (!scope.loginCredentials.otp) {
-          return;
-        }
         scope.authenticationFailed = false;
         scope.load = true;
         authenticationService.authenticateWithUsernamePassword(
@@ -26712,17 +26808,17 @@
       });
 
       /*This logic is no longer required as enter button is binded with text field for submit.
-            $('#pwd').keypress(function (e) {
-                if (e.which == 13) {
-                    scope.login();
-                }
-            });*/
+          $('#pwd').keypress(function (e) {
+              if (e.which == 13) {
+                  scope.login();
+              }
+          });*/
 
       /*$('#repeatPassword').keypress(function (e) {
-                if (e.which == 13) {
-                    scope.updatePassword();
-                }
-            });*/
+              if (e.which == 13) {
+                  scope.updatePassword();
+              }
+          });*/
 
       scope.updatePassword = function () {
         resourceFactory.userListResource.update(
@@ -30376,11 +30472,11 @@
         );
       };
       /*scope.delete = function (tellerId, cashierId) {
-                resourceFactory.tellerCashierResource.delete({tellerId: tellerId, cashierId: cashierId}, function (data) {
-                    location.path('/tellers/' + tellerId + "/cashiers/");
-                });
+              resourceFactory.tellerCashierResource.delete({tellerId: tellerId, cashierId: cashierId}, function (data) {
+                  location.path('/tellers/' + tellerId + "/cashiers/");
+              });
 
-            };*/
+          };*/
 
       scope.deepCopy = function (obj) {
         if (Object.prototype.toString.call(obj) === "[object Array]") {
@@ -32628,12 +32724,12 @@
           }
         }
         /*for (var i = 0; i < scope.reqFields.length; i++) {
-                    var tempParam = scope.reqFields[i];
-                    if (tempParam.displayType == 'none') {
-                        reportParams += ","
-                        reportParams += encodeURIComponent(tempParam.inputName) + ":" + encodeURIComponent("-1");
-                    }
-                }*/
+                  var tempParam = scope.reqFields[i];
+                  if (tempParam.displayType == 'none') {
+                      reportParams += ","
+                      reportParams += encodeURIComponent(tempParam.inputName) + ":" + encodeURIComponent("-1");
+                  }
+              }*/
         return reportParams;
       }
 
@@ -32779,11 +32875,11 @@
         if (WizardHandler.wizard().currentStepNumber() != scope.noOfTabs) {
           WizardHandler.wizard().next();
           /*if (WizardHandler.wizard().currentStepNumber() == 2) {
-                     if (scope.validateFiles())
-                     WizardHandler.wizard().next();
-                     } else {
-                     WizardHandler.wizard().next();
-                     }*/
+                   if (scope.validateFiles())
+                   WizardHandler.wizard().next();
+                   } else {
+                   WizardHandler.wizard().next();
+                   }*/
           return;
         }
 
@@ -35726,7 +35822,8 @@
         scope.selectedConfigurableAttributes = {
           amortizationType: scope.amortization,
           interestType: scope.interestMethod,
-          transactionProcessingStrategyId: scope.transactionProcessingStrategy,
+          transactionProcessingStrategyCode:
+            scope.transactionProcessingStrategy,
           interestCalculationPeriodType: scope.interestCalcPeriod,
           inArrearsTolerance: scope.arrearsTolerance,
           repaymentEvery: scope.repaymentFrequency,
@@ -35820,7 +35917,10 @@
           delete this.formData.recalculationRestFrequencyNthDayType;
         }
         resourceFactory.loanProductResource.save(
-          this.formData,
+          {
+            ...this.formData,
+            transactionProcessingStrategyCode: "mifos-standard-strategy",
+          },
           function (data) {
             location.path("/viewloanproduct/" + data.resourceId);
           }
@@ -42046,9 +42146,17 @@
       $sce,
       $log
     ) {
-      today = `${new Date().getDate()}-${
-        new Date().getMonth() + 1
-      }-${new Date().getFullYear()}`;
+      var baseUrl = "",
+        apiVer = "/fineract-provider/api/v1",
+        tenantIdentifier = "";
+      this.setBaseUrl = function (url) {
+        baseUrl = url;
+        console.log(baseUrl);
+      };
+
+      this.setTenantIdenetifier = function (tenant) {
+        tenantIdentifier = tenant;
+      };
       scope.isCollapsed = false; //displays options div on startup
       scope.hideTable = true; //hides the results div on startup
       scope.hidePentahoReport = true; //hides the results div on startup
@@ -42118,6 +42226,7 @@
           }
         }
       );
+
       scope.downloadReport = function () {
         const url = window.location.search;
         const queryParams = new URLSearchParams(url);
@@ -42430,11 +42539,13 @@
           scope.isCollapsed = true;
           switch (scope.reportType) {
             case "Table":
+
             case "SMS":
               scope.hideTable = false;
               scope.hidePentahoReport = true;
               scope.hideChart = true;
               scope.formData.reportSource = scope.reportName;
+
               resourceFactory.runReportsResource.getReport(
                 scope.formData,
                 function (data) {
@@ -42490,7 +42601,6 @@
                   var contentType = headers("Content-Type");
                   var file = new Blob([data], { type: contentType });
                   var fileContent = URL.createObjectURL(file);
-
                   // Pass the form data to the iframe as a data url.
                   scope.baseURL = $sce.trustAsResourceUrl(fileContent);
                 })
@@ -46644,8 +46754,8 @@
       scope.accountNo = routeParams.id;
 
       /*resourceFactory.savingsResource.get({accountId: routeParams.id, template: 'true'}, function (data) {
-                scope.data = data;
-            });*/
+              scope.data = data;
+          });*/
 
       scope.cancel = function () {
         location.path("/viewsavingaccount/" + scope.accountNo);
@@ -47568,19 +47678,19 @@
         }
       );
       /*// Saving notes not yet implemented
-            resourceFactory.savingsResource.getAllNotes({accountId: routeParams.id,resourceType:'notes'}, function (data) {
-                scope.savingNotes = data;
-            });
+          resourceFactory.savingsResource.getAllNotes({accountId: routeParams.id,resourceType:'notes'}, function (data) {
+              scope.savingNotes = data;
+          });
 
-            scope.saveNote = function () {
-                resourceFactory.savingsResource.save({accountId: routeParams.id, resourceType: 'notes'}, this.formData, function (data) {
-                    var today = new Date();
-                    temp = { id: data.resourceId, note: scope.formData.note, createdByUsername: "test", createdOn: today };
-                    scope.savingNotes.push(temp);
-                    scope.formData.note = "";
-                    scope.predicate = '-id';
-                });
-            };*/
+          scope.saveNote = function () {
+              resourceFactory.savingsResource.save({accountId: routeParams.id, resourceType: 'notes'}, this.formData, function (data) {
+                  var today = new Date();
+                  temp = { id: data.resourceId, note: scope.formData.note, createdByUsername: "test", createdOn: today };
+                  scope.savingNotes.push(temp);
+                  scope.formData.note = "";
+                  scope.predicate = '-id';
+              });
+          };*/
 
       scope.dataTableChange = function (datatable) {
         resourceFactory.DataTablesResource.getTableDetails(
@@ -48534,11 +48644,11 @@
           break;
         case "close":
           /* resourceFactory.savingsTrxnsTemplateResource.get({savingsId: scope.accountId}, function (data) {
-                        scope.paymentTypes = data.paymentTypeOptions;
-                    });
-                    resourceFactory.savingsResource.get({accountId: routeParams.id, fields:'summary'}, function (accountData) {
-                        scope.accountBalance = accountData.summary.accountBalance;
-                    });*/
+                      scope.paymentTypes = data.paymentTypeOptions;
+                  });
+                  resourceFactory.savingsResource.get({accountId: routeParams.id, fields:'summary'}, function (accountData) {
+                      scope.accountBalance = accountData.summary.accountBalance;
+                  });*/
           scope.title = "label.heading.closeshareaccount";
           scope.labelName = "label.input.closedon";
           scope.modelName = "closedDate";
@@ -50536,11 +50646,11 @@
           if (scope.columns[i].originalName) {
             //This value should be updated based on the configuration
             /*if (scope.columns[i].newName) {
-                         if (scope.columns[i].type == "dropdown") {
-                         scope.columns[i].columnName = scope.columns[i].originalName;
-                         scope.columns[i].newName = scope.columns[i].columnCode + "_cd_" + scope.columns[i].newName;
-                         }
-                         }*/
+                       if (scope.columns[i].type == "dropdown") {
+                       scope.columns[i].columnName = scope.columns[i].originalName;
+                       scope.columns[i].newName = scope.columns[i].columnCode + "_cd_" + scope.columns[i].newName;
+                       }
+                       }*/
 
             delete scope.columns[i].originalName;
             delete scope.columns[i].type;
@@ -53002,16 +53112,16 @@
       };
 
       /* -----Throws error on test-----
-             if (!scope.searchCriteria.users) {
-             scope.searchCriteria.users = null;
-             scope.saveSC();
-             }
-             scope.filterText = scope.searchCriteria.users;
+           if (!scope.searchCriteria.users) {
+           scope.searchCriteria.users = null;
+           scope.saveSC();
+           }
+           scope.filterText = scope.searchCriteria.users;
 
-             scope.onFilter = function () {
-             scope.searchCriteria.users = scope.filterText;
-             scope.saveSC();
-             };*/
+           scope.onFilter = function () {
+           scope.searchCriteria.users = scope.filterText;
+           scope.saveSC();
+           };*/
 
       scope.UsersPerPage = 15;
       resourceFactory.userListResource.getAllUsers(function (data) {

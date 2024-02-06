@@ -51,6 +51,13 @@
         <h4>{{'label.heading.tellerPosting' | translate}}</h4>
         <div class="pull-right">
           <a
+            href="#/bulkimporttellerposting"
+            class="btn btn-info"
+            has-permission="CREATE_TELLER"
+            ><i class="fa fa-plus"></i>&nbsp;&nbsp;{{'label.button.bulkTeller' |
+            translate}}</a
+          >
+          <a
             href="#/create_teller"
             class="btn btn-primary"
             has-permission="CREATE_TELLER"
@@ -66,7 +73,7 @@
             type="text"
             ng-keyup="onFilter()"
             class="form-control"
-            placeholder="{{'label.input.filterbyAccountGlcodeAccounttype' | translate}}"
+            placeholder="{{'Filter by tran Ref No' | translate}}"
           />
         </div>
         <!-- <div class="col-sm-3 paddedbottom10">
