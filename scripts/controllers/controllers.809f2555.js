@@ -1373,6 +1373,7 @@
       Upload
     ) {
       scope.first = {};
+      scope.fileTypes = [];
       scope.first.templateUrl = "../../../images/bulktellerTemp.csv";
       scope.formData = {};
       var requestParams = { staffInSelectedOfficeOnly: true };
@@ -1384,7 +1385,9 @@
           scope.staffs = data.staffOptions;
         }
       );
-
+      resourceFactory.getFileUploadType.get(function (data) {
+        scope.fileTypes = data.listData;
+      });
       scope.first.queryParams = "&";
       scope.changeOffice = function () {
         if (scope.formData.officeId) {
@@ -1425,7 +1428,10 @@
 
       scope.upload = function () {
         Upload.upload({
-          url: $rootScope.hostUrl + API_VERSION + "/tellerposting/upload",
+          url:
+            $rootScope.hostUrl +
+            API_VERSION +
+            `/tellerposting/upload?fileUploadType=${formData.fileType}`,
           data: {
             file: scope.formData.file,
             // locale: scope.optlang.code,
@@ -23735,7 +23741,7 @@
           scope.formData.syncDisbursementWithMeeting = true;
         }
         scope.multiDisburseLoan = scope.loanaccountinfo.multiDisburseLoan;
-        scope.formData.productId = scope.loanaccountinfo.loanProductId;
+        scope.formData.productId = scope.loanaccountinfo.product.id;
         scope.formData.fundId = scope.loanaccountinfo.fundId;
         scope.formData.principal = scope.loanaccountinfo.principal;
         scope.formData.loanTermFrequency = scope.loanaccountinfo.termFrequency;
@@ -23778,7 +23784,7 @@
         scope.formData.graceOnArrearsAgeing =
           scope.loanaccountinfo.graceOnArrearsAgeing;
         scope.formData.transactionProcessingStrategyId =
-          scope.loanaccountinfo.transactionProcessingStrategyId;
+          scope.loanaccountinfo.transactionProcessingStrategyCode;
         scope.loandetails.transactionProcessingStrategyValue = scope.formValue(
           scope.loanaccountinfo.transactionProcessingStrategyOptions,
           scope.formData.transactionProcessingStrategyId,
@@ -23880,10 +23886,18 @@
       scope.formValue = function (array, model, findattr, retAttr) {
         findattr = findattr ? findattr : "id";
         retAttr = retAttr ? retAttr : "value";
-        console.log(findattr, retAttr, model);
-        return _.find(array, function (obj) {
-          return obj[findattr] === model;
-        })[retAttr];
+        console.log(findattr, retAttr, model, scope.formData);
+        console.log(array);
+
+        var foundObj = _.find(array, function (obj) {
+          return obj[retAttr] === model;
+        });
+
+        if (foundObj) {
+          return foundObj[findattr];
+        } else {
+          return "mifos-standard-strategy";
+        }
       };
 
       scope.addCharge = function () {
@@ -25656,25 +25670,21 @@
           scope.loandetails.clientId != null &&
           scope.loandetails.clientId != ""
         ) {
-          location
-            .path("/viewtransactions/" + transactionId)
-            .search({
-              productName: scope.loandetails.loanProductName,
-              loanId: scope.loandetails.id,
-              clientId: scope.loandetails.clientId,
-              accountNo: scope.loandetails.accountNo,
-              clientName: scope.loandetails.clientName,
-            });
+          location.path("/viewtransactions/" + transactionId).search({
+            productName: scope.loandetails.loanProductName,
+            loanId: scope.loandetails.id,
+            clientId: scope.loandetails.clientId,
+            accountNo: scope.loandetails.accountNo,
+            clientName: scope.loandetails.clientName,
+          });
         } else {
-          location
-            .path("/viewtransactions/" + transactionId)
-            .search({
-              productName: scope.loandetails.loanProductName,
-              loanId: scope.loandetails.id,
-              accountNo: scope.loandetails.accountNo,
-              groupId: scope.loandetails.group.id,
-              groupName: scope.loandetails.group.name,
-            });
+          location.path("/viewtransactions/" + transactionId).search({
+            productName: scope.loandetails.loanProductName,
+            loanId: scope.loandetails.id,
+            accountNo: scope.loandetails.accountNo,
+            groupId: scope.loandetails.group.id,
+            groupName: scope.loandetails.group.name,
+          });
         }
       };
 
