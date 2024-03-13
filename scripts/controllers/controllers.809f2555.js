@@ -7381,12 +7381,12 @@
         }
 
         /* resourceFactory.getAllFamilyMembers.get({clientId:routeParams.id},function(data)
-              {
+                {
 
-                  scope.families=data;
+                    scope.families=data;
 
 
-              })*/
+                })*/
       });
 
       scope.routeTo = function () {
@@ -12409,46 +12409,46 @@
           scope.actionName = "Approve application";
           break;
         /*case "deposit":
-               resourceFactory.savingsTrxnsTemplateResource.get({savingsId:scope.accountId, command:'deposit'}, function (data) {
-               scope.paymentTypes=data.paymentTypeOptions;
-               });
-               scope.title = 'label.heading.depositmoneytosavingaccount';
-               scope.labelName = 'label.input.transactiondate';
-               scope.modelName = 'transactionDate';
-               scope.showDateField = true;
-               scope.showNoteField = false;
-               scope.isTransaction = true;
-               scope.showPaymentDetails = false;
-               break;
-               case "withdrawal":
-               resourceFactory.savingsTrxnsTemplateResource.get({savingsId:scope.accountId, command:'withdrawal'}, function (data) {
-               scope.paymentTypes=data.paymentTypeOptions;
-               });
-               scope.title = 'label.heading.withdrawmoneyfromsavingaccount';
-               scope.labelName = 'label.input.transactiondate';
-               scope.modelName = 'transactionDate';
-               scope.showDateField = true;
-               scope.showNoteField = false;
-               scope.isTransaction = true;
-               scope.showPaymentDetails = false;
-               break;
-               case "applyAnnualFees":
-               resourceFactory.savingsResource.get({accountId : routeParams.id, resourceType : 'charges', chargeId : routeParams.chargeId},
-               function (data) {
-               scope.formData.amount = data.amount;
-               if (data.dueDate) {
-               var dueDate = dateFilter(data.dueDate, scope.df);
-               scope.formData.dueDate = new Date(dueDate);
-               }
-               });
-               scope.title = 'label.heading.savingaccountapplyannualFee';
-               scope.labelName = 'label.input.annualfeetransactiondate';
-               scope.modelName = 'dueDate';
-               scope.showDateField = true;
-               scope.showAnnualAmountField = true;
-               scope.showAmountField = false;
-               scope.showNoteField = false;
-               break;*/
+                 resourceFactory.savingsTrxnsTemplateResource.get({savingsId:scope.accountId, command:'deposit'}, function (data) {
+                 scope.paymentTypes=data.paymentTypeOptions;
+                 });
+                 scope.title = 'label.heading.depositmoneytosavingaccount';
+                 scope.labelName = 'label.input.transactiondate';
+                 scope.modelName = 'transactionDate';
+                 scope.showDateField = true;
+                 scope.showNoteField = false;
+                 scope.isTransaction = true;
+                 scope.showPaymentDetails = false;
+                 break;
+                 case "withdrawal":
+                 resourceFactory.savingsTrxnsTemplateResource.get({savingsId:scope.accountId, command:'withdrawal'}, function (data) {
+                 scope.paymentTypes=data.paymentTypeOptions;
+                 });
+                 scope.title = 'label.heading.withdrawmoneyfromsavingaccount';
+                 scope.labelName = 'label.input.transactiondate';
+                 scope.modelName = 'transactionDate';
+                 scope.showDateField = true;
+                 scope.showNoteField = false;
+                 scope.isTransaction = true;
+                 scope.showPaymentDetails = false;
+                 break;
+                 case "applyAnnualFees":
+                 resourceFactory.savingsResource.get({accountId : routeParams.id, resourceType : 'charges', chargeId : routeParams.chargeId},
+                 function (data) {
+                 scope.formData.amount = data.amount;
+                 if (data.dueDate) {
+                 var dueDate = dateFilter(data.dueDate, scope.df);
+                 scope.formData.dueDate = new Date(dueDate);
+                 }
+                 });
+                 scope.title = 'label.heading.savingaccountapplyannualFee';
+                 scope.labelName = 'label.input.annualfeetransactiondate';
+                 scope.modelName = 'dueDate';
+                 scope.showDateField = true;
+                 scope.showAnnualAmountField = true;
+                 scope.showAmountField = false;
+                 scope.showNoteField = false;
+                 break;*/
         case "close":
           resourceFactory.fixedDepositAccountResource.get(
             {
@@ -12706,10 +12706,10 @@
               );
             }
             /*} else if (scope.action == "applyAnnualFees" || scope.action == "paycharge" || scope.action == "waivecharge") {
-                       params = {accountId : routeParams.id, resourceType : 'charges', chargeId : routeParams.chargeId, command : 'paycharge'};
-                       if (this.formData.dueDate) {
-                       this.formData.dueDate = dateFilter(this.formData.dueDate,scope.df);
-                       }*/
+                         params = {accountId : routeParams.id, resourceType : 'charges', chargeId : routeParams.chargeId, command : 'paycharge'};
+                         if (this.formData.dueDate) {
+                         this.formData.dueDate = dateFilter(this.formData.dueDate,scope.df);
+                         }*/
           } else if (scope.action === "close") {
             if (this.formData.closedOnDate) {
               this.formData.closedOnDate = dateFilter(
@@ -12862,13 +12862,13 @@
             );
             break;
           /*          case "applyAnnualFees":
-                   location.path('/savingaccountcharge/' + accountId + '/applyAnnualFees/' + scope.annualChargeId);
-                   break;
-                   case "transferFunds":
-                   if (scope.savingaccountdetails.clientId) {
-                   location.path('/accounttransfers/fromsavings/'+accountId);
-                   }
-                   break;*/
+                     location.path('/savingaccountcharge/' + accountId + '/applyAnnualFees/' + scope.annualChargeId);
+                     break;
+                     case "transferFunds":
+                     if (scope.savingaccountdetails.clientId) {
+                     location.path('/accounttransfers/fromsavings/'+accountId);
+                     }
+                     break;*/
           case "close":
             location.path("/fixeddepositaccount/" + accountId + "/close");
             break;
@@ -13032,10 +13032,10 @@
               }
             }
             /*if (data.clientId) {
-                   scope.buttons.options.push({
-                   name:"button.transferFunds"
-                   });
-                   }*/
+                     scope.buttons.options.push({
+                     name:"button.transferFunds"
+                     });
+                     }*/
           } else if (data.status.value == "Matured") {
             scope.buttons = {
               singlebuttons: [
@@ -13058,10 +13058,10 @@
               ],
             };
             /*if (data.clientId) {
-                   scope.buttons.options.push({
-                   name:"button.transferFunds"
-                   });
-                   }*/
+                     scope.buttons.options.push({
+                     name:"button.transferFunds"
+                     });
+                     }*/
           }
 
           resourceFactory.standingInstructionTemplateResource.get(
@@ -15199,10 +15199,10 @@
               );
             }
             /*} else if (scope.action == "applyAnnualFees" || scope.action == "paycharge" || scope.action == "waivecharge") {
-                       params = {accountId : routeParams.id, resourceType : 'charges', chargeId : routeParams.chargeId, command : 'paycharge'};
-                       if (this.formData.dueDate) {
-                       this.formData.dueDate = dateFilter(this.formData.dueDate,scope.df);
-                       }*/
+                         params = {accountId : routeParams.id, resourceType : 'charges', chargeId : routeParams.chargeId, command : 'paycharge'};
+                         if (this.formData.dueDate) {
+                         this.formData.dueDate = dateFilter(this.formData.dueDate,scope.df);
+                         }*/
           } else if (scope.action === "close") {
             if (this.formData.closedOnDate) {
               this.formData.closedOnDate = dateFilter(
@@ -15365,13 +15365,13 @@
             );
             break;
           /*case "applyAnnualFees":
-                      location.path('/savingaccountcharge/' + accountId + '/applyAnnualFees/' + scope.annualChargeId);
-                      break;
-                  case "transferFunds":
-                      if (scope.savingaccountdetails.clientId) {
-                          location.path('/accounttransfers/fromsavings/' + accountId);
-                      }
-                      break;*/
+                        location.path('/savingaccountcharge/' + accountId + '/applyAnnualFees/' + scope.annualChargeId);
+                        break;
+                    case "transferFunds":
+                        if (scope.savingaccountdetails.clientId) {
+                            location.path('/accounttransfers/fromsavings/' + accountId);
+                        }
+                        break;*/
           case "close":
             location.path("/recurringdepositaccount/" + accountId + "/close");
             break;
@@ -15590,9 +15590,9 @@
           }
 
           /*var annualdueDate = [];
-               annualdueDate = data.annualFee.feeOnMonthDay;
-               annualdueDate.push(2013);
-               scope.annualdueDate = new Date(annualdueDate);*/
+                 annualdueDate = data.annualFee.feeOnMonthDay;
+                 annualdueDate.push(2013);
+                 scope.annualdueDate = new Date(annualdueDate);*/
           resourceFactory.standingInstructionTemplateResource.get(
             {
               fromClientId: scope.savingaccountdetails.clientId,
@@ -24215,17 +24215,16 @@
         } else {
           delete scope.formData.datatables;
         }
-        (this.formData.transactionProcessingStrategyCode =
-          this.formData.transactionProcessingStrategyId),
-          delete this.formData.transactionProcessingStrategyId;
-        resourceFactory.loanResource.save(
-          {
-            ...this.formData,
-          },
-          function (data) {
-            location.path("/viewloanaccount/" + data.loanId);
-          }
-        );
+        let payload = {
+          ...this.formData,
+          transactionProcessingStrategyCode:
+            this.formData.transactionProcessingStrategyId,
+        };
+
+        delete payload.transactionProcessingStrategyId;
+        resourceFactory.loanResource.save(payload, function (data) {
+          location.path("/viewloanaccount/" + data.loanId);
+        });
       };
 
       scope.cancel = function () {
@@ -26830,17 +26829,17 @@
       });
 
       /*This logic is no longer required as enter button is binded with text field for submit.
-          $('#pwd').keypress(function (e) {
-              if (e.which == 13) {
-                  scope.login();
-              }
-          });*/
+            $('#pwd').keypress(function (e) {
+                if (e.which == 13) {
+                    scope.login();
+                }
+            });*/
 
       /*$('#repeatPassword').keypress(function (e) {
-              if (e.which == 13) {
-                  scope.updatePassword();
-              }
-          });*/
+                if (e.which == 13) {
+                    scope.updatePassword();
+                }
+            });*/
 
       scope.updatePassword = function () {
         resourceFactory.userListResource.update(
@@ -30494,11 +30493,11 @@
         );
       };
       /*scope.delete = function (tellerId, cashierId) {
-              resourceFactory.tellerCashierResource.delete({tellerId: tellerId, cashierId: cashierId}, function (data) {
-                  location.path('/tellers/' + tellerId + "/cashiers/");
-              });
+                resourceFactory.tellerCashierResource.delete({tellerId: tellerId, cashierId: cashierId}, function (data) {
+                    location.path('/tellers/' + tellerId + "/cashiers/");
+                });
 
-          };*/
+            };*/
 
       scope.deepCopy = function (obj) {
         if (Object.prototype.toString.call(obj) === "[object Array]") {
@@ -32746,12 +32745,12 @@
           }
         }
         /*for (var i = 0; i < scope.reqFields.length; i++) {
-                  var tempParam = scope.reqFields[i];
-                  if (tempParam.displayType == 'none') {
-                      reportParams += ","
-                      reportParams += encodeURIComponent(tempParam.inputName) + ":" + encodeURIComponent("-1");
-                  }
-              }*/
+                    var tempParam = scope.reqFields[i];
+                    if (tempParam.displayType == 'none') {
+                        reportParams += ","
+                        reportParams += encodeURIComponent(tempParam.inputName) + ":" + encodeURIComponent("-1");
+                    }
+                }*/
         return reportParams;
       }
 
@@ -32897,11 +32896,11 @@
         if (WizardHandler.wizard().currentStepNumber() != scope.noOfTabs) {
           WizardHandler.wizard().next();
           /*if (WizardHandler.wizard().currentStepNumber() == 2) {
-                   if (scope.validateFiles())
-                   WizardHandler.wizard().next();
-                   } else {
-                   WizardHandler.wizard().next();
-                   }*/
+                     if (scope.validateFiles())
+                     WizardHandler.wizard().next();
+                     } else {
+                     WizardHandler.wizard().next();
+                     }*/
           return;
         }
 
@@ -46776,8 +46775,8 @@
       scope.accountNo = routeParams.id;
 
       /*resourceFactory.savingsResource.get({accountId: routeParams.id, template: 'true'}, function (data) {
-              scope.data = data;
-          });*/
+                scope.data = data;
+            });*/
 
       scope.cancel = function () {
         location.path("/viewsavingaccount/" + scope.accountNo);
@@ -47700,19 +47699,19 @@
         }
       );
       /*// Saving notes not yet implemented
-          resourceFactory.savingsResource.getAllNotes({accountId: routeParams.id,resourceType:'notes'}, function (data) {
-              scope.savingNotes = data;
-          });
+            resourceFactory.savingsResource.getAllNotes({accountId: routeParams.id,resourceType:'notes'}, function (data) {
+                scope.savingNotes = data;
+            });
 
-          scope.saveNote = function () {
-              resourceFactory.savingsResource.save({accountId: routeParams.id, resourceType: 'notes'}, this.formData, function (data) {
-                  var today = new Date();
-                  temp = { id: data.resourceId, note: scope.formData.note, createdByUsername: "test", createdOn: today };
-                  scope.savingNotes.push(temp);
-                  scope.formData.note = "";
-                  scope.predicate = '-id';
-              });
-          };*/
+            scope.saveNote = function () {
+                resourceFactory.savingsResource.save({accountId: routeParams.id, resourceType: 'notes'}, this.formData, function (data) {
+                    var today = new Date();
+                    temp = { id: data.resourceId, note: scope.formData.note, createdByUsername: "test", createdOn: today };
+                    scope.savingNotes.push(temp);
+                    scope.formData.note = "";
+                    scope.predicate = '-id';
+                });
+            };*/
 
       scope.dataTableChange = function (datatable) {
         resourceFactory.DataTablesResource.getTableDetails(
@@ -48666,11 +48665,11 @@
           break;
         case "close":
           /* resourceFactory.savingsTrxnsTemplateResource.get({savingsId: scope.accountId}, function (data) {
-                      scope.paymentTypes = data.paymentTypeOptions;
-                  });
-                  resourceFactory.savingsResource.get({accountId: routeParams.id, fields:'summary'}, function (accountData) {
-                      scope.accountBalance = accountData.summary.accountBalance;
-                  });*/
+                        scope.paymentTypes = data.paymentTypeOptions;
+                    });
+                    resourceFactory.savingsResource.get({accountId: routeParams.id, fields:'summary'}, function (accountData) {
+                        scope.accountBalance = accountData.summary.accountBalance;
+                    });*/
           scope.title = "label.heading.closeshareaccount";
           scope.labelName = "label.input.closedon";
           scope.modelName = "closedDate";
@@ -50668,11 +50667,11 @@
           if (scope.columns[i].originalName) {
             //This value should be updated based on the configuration
             /*if (scope.columns[i].newName) {
-                       if (scope.columns[i].type == "dropdown") {
-                       scope.columns[i].columnName = scope.columns[i].originalName;
-                       scope.columns[i].newName = scope.columns[i].columnCode + "_cd_" + scope.columns[i].newName;
-                       }
-                       }*/
+                         if (scope.columns[i].type == "dropdown") {
+                         scope.columns[i].columnName = scope.columns[i].originalName;
+                         scope.columns[i].newName = scope.columns[i].columnCode + "_cd_" + scope.columns[i].newName;
+                         }
+                         }*/
 
             delete scope.columns[i].originalName;
             delete scope.columns[i].type;
@@ -53134,16 +53133,16 @@
       };
 
       /* -----Throws error on test-----
-           if (!scope.searchCriteria.users) {
-           scope.searchCriteria.users = null;
-           scope.saveSC();
-           }
-           scope.filterText = scope.searchCriteria.users;
+             if (!scope.searchCriteria.users) {
+             scope.searchCriteria.users = null;
+             scope.saveSC();
+             }
+             scope.filterText = scope.searchCriteria.users;
 
-           scope.onFilter = function () {
-           scope.searchCriteria.users = scope.filterText;
-           scope.saveSC();
-           };*/
+             scope.onFilter = function () {
+             scope.searchCriteria.users = scope.filterText;
+             scope.saveSC();
+             };*/
 
       scope.UsersPerPage = 15;
       resourceFactory.userListResource.getAllUsers(function (data) {
