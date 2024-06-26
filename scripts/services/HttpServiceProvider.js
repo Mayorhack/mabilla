@@ -51,6 +51,11 @@
               } else {
                 http.defaults.headers.common.Authorization = "Basic " + key;
               }
+              http.defaults.headers.common["x-source-code"] = "PRODMOBILEAPP";
+              http.defaults.headers.common["x-client-id"] =
+                "lL/2C0OVKYOBfGqdvZuoUl6XDAYx9J2l43yGEAb9XcXzQsUCB31N5iY0RojaHuOTqOKBI7tGpndt43KDwg1CwQ==";
+              http.defaults.headers.common["x-client-secret"] =
+                "501L3Xh6kjv4ll5B+TIj6iZRVOTesp/Zi0uQc8LSsH6HOwJvWkO9j/eZCDnW/YLdkCdVOtG7kLrG01BcewIm7rkmueuxVfRtixuHDFF7HyeFlA0mLn41RX2DrMmaxR9+I/Qwv3sqFvpa/o5jlmNwzKYV4tFODxrahgSdqC5CU02ju5MJiayrdkQGQYNKnLb0iHPYOoQzZ0nyCVxHTRoMiG6gznK58NMyKWkiAwEFky4rcusn403Gnf09/IAEq8ZEbfXJ0vFSFTMrnEebHxjF2A==";
             };
 
             this.cancelAuthorization = function () {
