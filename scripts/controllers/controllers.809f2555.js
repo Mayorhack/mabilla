@@ -25677,25 +25677,21 @@
           scope.loandetails.clientId != null &&
           scope.loandetails.clientId != ""
         ) {
-          location
-            .path("/viewtransactions/" + transactionId)
-            .search({
-              productName: scope.loandetails.loanProductName,
-              loanId: scope.loandetails.id,
-              clientId: scope.loandetails.clientId,
-              accountNo: scope.loandetails.accountNo,
-              clientName: scope.loandetails.clientName,
-            });
+          location.path("/viewtransactions/" + transactionId).search({
+            productName: scope.loandetails.loanProductName,
+            loanId: scope.loandetails.id,
+            clientId: scope.loandetails.clientId,
+            accountNo: scope.loandetails.accountNo,
+            clientName: scope.loandetails.clientName,
+          });
         } else {
-          location
-            .path("/viewtransactions/" + transactionId)
-            .search({
-              productName: scope.loandetails.loanProductName,
-              loanId: scope.loandetails.id,
-              accountNo: scope.loandetails.accountNo,
-              groupId: scope.loandetails.group.id,
-              groupName: scope.loandetails.group.name,
-            });
+          location.path("/viewtransactions/" + transactionId).search({
+            productName: scope.loandetails.loanProductName,
+            loanId: scope.loandetails.id,
+            accountNo: scope.loandetails.accountNo,
+            groupId: scope.loandetails.group.id,
+            groupName: scope.loandetails.group.name,
+          });
         }
       };
 
