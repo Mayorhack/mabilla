@@ -1881,7 +1881,7 @@
 
       scope.submit = function () {
         var jeTransaction = new Object();
-        var reqDate = dateFilter(scope.first.date, scope.df);
+        var reqDate = dateFilter(scope.first.date, "dd-MM-yyyy");
         jeTransaction.locale = scope.optlang.code;
         jeTransaction.dateFormat = scope.df;
         jeTransaction.officeId = this.formData.officeId;
