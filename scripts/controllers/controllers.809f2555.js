@@ -1883,7 +1883,7 @@
         var jeTransaction = new Object();
         var reqDate = dateFilter(scope.first.date, "dd-MM-yyyy");
         jeTransaction.locale = scope.optlang.code;
-        jeTransaction.dateFormat = scope.df;
+        jeTransaction.dateFormat = "dd-MM-yyyy";
         jeTransaction.officeId = this.formData.officeId;
         jeTransaction.transactionDate = reqDate;
         jeTransaction.referenceNumber = this.formData.referenceNumber;
