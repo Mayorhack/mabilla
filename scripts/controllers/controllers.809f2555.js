@@ -1431,7 +1431,7 @@
           url:
             $rootScope.hostUrl +
             API_VERSION +
-            `/tellerposting/upload?fileUploadType=${formData.fileType}`,
+            `/tellerposting/upload?fileUploadType=${scope.formData.fileType}`,
           data: {
             file: scope.formData.file,
             // locale: scope.optlang.code,
