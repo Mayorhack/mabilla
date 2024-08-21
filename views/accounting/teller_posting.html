@@ -118,7 +118,11 @@
 
               <td class="pointer">{{coadata.amount}}</td>
               <td class="pointer">{{coadata.status}}</td>
-              <td class="pointer" has-permission="UPDATE_TELLER">
+              <td
+                class="pointer"
+                has-permission="UPDATE_TELLER"
+                data-ng-show="coadata.status==='Pending'"
+              >
                 <span
                   ><a
                     uib-tooltip="Approve"

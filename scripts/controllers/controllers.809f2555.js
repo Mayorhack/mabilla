@@ -1439,7 +1439,7 @@
             name: "teller" + new Date().getTime(),
           },
         }).then(function (data) {
-          location.path("/viewtellers/" + data.resourceId);
+          location.path("/teller_posting")
           // to fix IE not refreshing the model
           if (!scope.$$phase) {
             scope.$apply();
