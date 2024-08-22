@@ -110,6 +110,8 @@
             <tr
               class="pointer-main"
               dir-paginate="coadata in coadatas | orderBy:['type.value','glCode']| SearchFilter:filterText |  itemsPerPage: ChartsPerPage"
+              total-items="totalPosting"
+              pagination-id="posting"
             >
               <td class="pointer">{{coadata.tranRefNo}}</td>
               <td class="pointer">{{coadata.transactionDate}}</td>
@@ -153,6 +155,8 @@
         <dir-pagination-controls
           boundary-links="true"
           template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"
+          on-page-change="getResultsPage(newPageNumber)"
+          pagination-id="posting"
         ></dir-pagination-controls>
       </div>
 

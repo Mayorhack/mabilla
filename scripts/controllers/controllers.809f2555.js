@@ -1439,7 +1439,7 @@
             name: "teller" + new Date().getTime(),
           },
         }).then(function (data) {
-          location.path("/teller_posting")
+          location.path("/teller_posting");
           // to fix IE not refreshing the model
           if (!scope.$$phase) {
             scope.$apply();
@@ -2505,17 +2505,26 @@
       };
 
       scope.ChartsPerPage = 15;
-      resourceFactory.tellerPostingResource.getAllAccountCoas(
-        {
-          endDate: today,
-          startDate: this.formData?.startDate
-            ? this.formData.startDate
-            : "01-01-2023",
-        },
-        function (data) {
-          scope.coadatas = data.transactionResponseList;
-        }
-      );
+      getAll = function (pageNumber) {
+        resourceFactory.tellerPostingResource.getAllAccountCoas(
+          {
+            endDate: today,
+            startDate: this.formData?.startDate
+              ? this.formData.startDate
+              : "01-01-2023",
+            pageSize: scope.ChartsPerPage,
+            pageNumber: pageNumber || 1,
+          },
+          function (data) {
+            scope.coadatas = data.transactionResponseList;
+            scope.totalPosting = data.totalCount;
+          }
+        );
+      };
+      scope.getResultsPage = function (pageNumber) {
+        getAll(pageNumber);
+      };
+      getAll();
     },
   });
   mifosX.ng.application

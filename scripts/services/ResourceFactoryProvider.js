@@ -740,8 +740,6 @@
                 getAllAccountCoas: {
                   method: "GET",
                   params: {
-                    pageSize: 100,
-                    pageNumber: 1,
                     startDate: "01-01-2023",
                   },
                 },
