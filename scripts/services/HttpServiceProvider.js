@@ -36,11 +36,12 @@
               };
             });
             _.each(["post", "put"], function (method) {
-              self[method] = function (url, data) {
+              self[method] = function (url, data, headers) {
                 var config = getConfig({
                   method: method.toUpperCase(),
                   url: url,
                   data: data,
+                  headers: headers,
                 });
                 return http(config);
               };
@@ -51,11 +52,6 @@
               } else {
                 http.defaults.headers.common.Authorization = "Basic " + key;
               }
-              http.defaults.headers.common["x-source-code"] = "PRODMOBILEAPP";
-              http.defaults.headers.common["x-client-id"] =
-                "LIV_PRODMOBILEAPP_558763550576155756010023806468";
-              http.defaults.headers.common["x-client-secret"] =
-                "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJQUk9ETU9CSUxFQVBQIiwiaWF0IjoxNzA3ODU3NzE2LCJzdWIiOiJQUk9ETU9CSUxFQVBQIiwiaXNzIjoiUFJPRE1PQklMRUFQUCIsImV4cCI6MTcwNjA2NjAxOX0.H2ZEHs03RpaQ_rASkBJupl8xwicnkomDomsOX2HN93s";
             };
 
             this.cancelAuthorization = function () {
@@ -70,6 +66,8 @@
                 token;
             };
             this.setOTPToken = function (token) {
+              console.log("otp set");
+
               http.defaults.headers.common["otp"] = token;
             };
           };

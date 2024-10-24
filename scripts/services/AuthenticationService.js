@@ -94,10 +94,16 @@
         } else {
           httpService.setOTPToken(credentials.otp);
           httpService
-            .post(apiVer + "/authentication", {
-              username: credentials.username,
-              password: credentials.password,
-            })
+            .post(
+              apiVer + "/authentication?otp=" + credentials.otp,
+              {
+                username: credentials.username,
+                password: credentials.password,
+              },
+              {
+                // otp: credentials.otp,
+              }
+            )
             .then(onLoginSuccess)
             .catch(onLoginFailure);
         }
