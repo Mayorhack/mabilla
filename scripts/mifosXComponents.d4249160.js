@@ -13,13 +13,13 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
             'NotificationResponseHeaderProvider'
         ],
         controllers: [
-            'controllers.809f2555'
+            'controllers.cf94556e'
         ],
         filters: [
             'filters.b8785e06'
         ],
         directives: [
-            'directives.72678338'
+            'directives.922f124e'
         ]
     };
 
@@ -30,7 +30,7 @@ define(['Q', 'underscore', 'mifosX'], function (Q) {
                 return group + "/" + name;
             }));
         }, [
-            'routes-initialTasks-webstorage-configuration.cbb9a189'
+            'routes-initialTasks-webstorage-configuration.7cbdb23d'
         ]), function(){
             defer.resolve();
         });
