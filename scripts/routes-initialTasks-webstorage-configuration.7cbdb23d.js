@@ -1218,7 +1218,7 @@
     else {
       if (mainLink.hostname != "") {
         baseApiUrl =
-          "http://" +
+          "https://" +
           mainLink.hostname +
           (mainLink.port ? ":" + mainLink.port : "");
       }
@@ -1228,7 +1228,7 @@
       }
       var queryLink = getLocation(baseApiUrl);
       host =
-        "http://" +
+        "https://" +
         queryLink.hostname +
         (queryLink.port ? ":" + queryLink.port : "");
       portNumber = queryLink.port;
