@@ -740,8 +740,6 @@
                 getAllAccountCoas: {
                   method: "GET",
                   params: {
-                    pageSize: 100,
-                    pageNumber: 1,
                     startDate: "01-01-2023",
                   },
                 },
@@ -787,11 +785,26 @@
                 },
               }
             ),
+            getFileUploadType: defineResource(
+              apiVer + "/tellerposting/lookup-data",
+              { glAccountId: "@glAccountId" },
+              {
+                get: {
+                  method: "GET",
+                  params: { categoryCode: "FILE_UPLOAD_TYPE" },
+                },
+              }
+            ),
             downloadReport: defineResource(
               apiVer + "/thirdparty/downloadReport",
               { glAccountId: "@glAccountId" },
               {
-                get: { method: "GET", params: {} },
+                get: {
+                  method: "GET",
+                  params: {},
+
+                  responseType: "blob",
+                },
               }
             ),
             accountLookupResource: defineResource(
