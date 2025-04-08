@@ -46650,7 +46650,7 @@
                 scope.df
               );
               this.formData.tranCode = "CSWD";
-              this.formData.extRefNo = "";
+              this.formData.extRefNo = new Date().getTime();
               this.formData.narration = this.formData.note;
               this.formData.postGlEntry = "Y";
             }
@@ -46661,7 +46661,7 @@
                 scope.df
               );
               this.formData.tranCode = "CSDP";
-              this.formData.extRefNo = "";
+              this.formData.extRefNo = new Date().getTime();
               this.formData.narration = this.formData.note;
               this.formData.postGlEntry = "Y";
             }
