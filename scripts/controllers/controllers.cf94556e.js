@@ -1468,6 +1468,147 @@
 })(mifosX.controllers || {});
 (function (module) {
   mifosX.controllers = _.extend(module, {
+    BulkImportTellerController: function (
+      scope,
+      resourceFactory,
+      location,
+      API_VERSION,
+      $rootScope,
+      Upload,
+      $uibModal
+    ) {
+      scope.first = {};
+      scope.response = "";
+      scope.coadatas = [];
+      scope.responseMessage = "";
+      scope.totalContracts = 0;
+      scope.batchNo = "";
+      scope.first.templateUrl =
+        API_VERSION +
+        "/offices/downloadtemplate" +
+        "?tenantIdentifier=" +
+        $rootScope.tenantIdentifier +
+        "&locale=" +
+        scope.optlang.code +
+        "&dateFormat=" +
+        scope.df;
+
+      scope.formData = {};
+      scope.onFileSelect = function (files) {
+        scope.formData.file = files[0];
+      };
+      const SuccessModalInstanceCtrl = function (
+        $scope,
+        $uibModalInstance,
+        responseMessage
+      ) {
+        $scope.responseMessage = responseMessage.replaceAll("<br/>", "\n");
+        $scope.close = function () {
+          $uibModalInstance.close("activate");
+        };
+        $scope.cancel = function () {
+          $uibModalInstance.dismiss("cancel");
+        };
+      };
+      formatDate = function (date) {
+        if (!date) return "";
+
+        let year = date.getFullYear();
+        let month = (date.getMonth() + 1).toString().padStart(2, "0");
+        let day = date.getDate().toString().padStart(2, "0");
+
+        return `${day}-${month}-${year}`;
+      };
+      resourceFactory.getLookupResource.get(
+        { categoryCode: "FILE_TYPE_UPLOAD" },
+        function (data) {
+          scope.names = data.listData;
+        }
+      );
+      scope.upload = function (validate) {
+        if (!scope.formData.file) {
+          scope.errorMsg = "Please upload a file";
+        }
+
+        Upload.upload({
+          url: $rootScope.hostUrl + API_VERSION + "/tellerposting/upload",
+          data: {
+            file: scope.formData.file,
+            tranDate: formatDate(scope.formData.tranDate),
+            desc: scope.formData.desc,
+            name: scope.formData.name,
+            allowOveride: scope.formData.allowOveride ? "Y" : "S",
+            validateStatus: validate ? "Y" : "S",
+          },
+        }).then(function (data) {
+          if (data.data.responseCode) {
+            validate
+              ? null
+              : $uibModal.open({
+                  templateUrl: "success.html",
+                  controller: SuccessModalInstanceCtrl,
+                });
+
+            scope.response = data.data.responseMessage.replaceAll(
+              "<br/>",
+              "\n"
+            );
+            scope.coadatas = data.data.data;
+            scope.totalContracts = data.data.data.length;
+          } else {
+            scope.errorMsg = data.data.responseMessage;
+          }
+        });
+      };
+      scope.validateStatus = function () {
+        if (!scope.batchNo) {
+          return;
+        }
+        resourceFactory.validateBatchStatus.get(
+          { batchNo: scope.batchNo },
+          function (data) {
+            if (data.responseCode == "00" || data.responseCode == "000") {
+              scope.responseMessage = data.responseMessage;
+              console.log(scope.responseMessage);
+
+              $uibModal.open({
+                templateUrl: "success.html",
+                controller: SuccessModalInstanceCtrl,
+                resolve: {
+                  responseMessage: function () {
+                    return data.responseMessage;
+                  },
+                },
+              });
+            } else {
+              scope.batchNo = "";
+              scope.errorMsg = data.responseMessage;
+            }
+          }
+        );
+      };
+      scope.close = function () {
+        scope.errorMsg = "";
+      };
+    },
+  });
+  mifosX.ng.application
+    .controller("BulkImportTellerController", [
+      "$scope",
+      "ResourceFactory",
+      "$location",
+      "API_VERSION",
+      "$rootScope",
+      "Upload",
+      "$uibModal",
+      mifosX.controllers.BulkImportTellerController,
+    ])
+    .run(function ($log) {
+      $log.info("BulkImportTellerController initialized");
+    });
+})(mifosX.controllers || {});
+(function (module) {
+  mifosX.controllers = _.extend(module, {
     CreateTellerPostingController: function (
       scope,
       resourceFactory,
@@ -25690,25 +25831,21 @@
           scope.loandetails.clientId != null &&
           scope.loandetails.clientId != ""
         ) {
-          location
-            .path("/viewtransactions/" + transactionId)
-            .search({
-              productName: scope.loandetails.loanProductName,
-              loanId: scope.loandetails.id,
-              clientId: scope.loandetails.clientId,
-              accountNo: scope.loandetails.accountNo,
-              clientName: scope.loandetails.clientName,
-            });
+          location.path("/viewtransactions/" + transactionId).search({
+            productName: scope.loandetails.loanProductName,
+            loanId: scope.loandetails.id,
+            clientId: scope.loandetails.clientId,
+            accountNo: scope.loandetails.accountNo,
+            clientName: scope.loandetails.clientName,
+          });
         } else {
-          location
-            .path("/viewtransactions/" + transactionId)
-            .search({
-              productName: scope.loandetails.loanProductName,
-              loanId: scope.loandetails.id,
-              accountNo: scope.loandetails.accountNo,
-              groupId: scope.loandetails.group.id,
-              groupName: scope.loandetails.group.name,
-            });
+          location.path("/viewtransactions/" + transactionId).search({
+            productName: scope.loandetails.loanProductName,
+            loanId: scope.loandetails.id,
+            accountNo: scope.loandetails.accountNo,
+            groupId: scope.loandetails.group.id,
+            groupName: scope.loandetails.group.name,
+          });
         }
       };
 

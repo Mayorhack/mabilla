@@ -25,6 +25,10 @@
       .when("/editstandinginstruction/:instructionId/:from", {
         templateUrl: "views/accounttransfers/edit_standinginstruction.html",
       })
+      .when("/file-upload", {
+        templateUrl:
+          "views/organization/bulkimport/bulkimporttellerposting.html",
+      })
       .when("/viewstandinginstruction/:instructionId", {
         templateUrl: "views/accounttransfers/view_standinginstruction.html",
       })
