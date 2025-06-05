@@ -1520,7 +1520,7 @@
         return `${day}-${month}-${year}`;
       };
       resourceFactory.getLookupResource.get(
-        { categoryCode:45 },
+        { categoryCode: "FILE_UPLOAD_TYPE" },
         function (data) {
           scope.names = data.listData;
         }
