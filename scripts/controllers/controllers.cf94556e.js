@@ -1531,7 +1531,11 @@
         }
 
         Upload.upload({
-          url: $rootScope.hostUrl + API_VERSION + "/tellerposting/upload",
+          url:
+            $rootScope.hostUrl +
+            API_VERSION +
+            "/tellerposting/upload?fileUploadType=" +
+            scope.formData.name,
           data: {
             file: scope.formData.file,
             tranDate: formatDate(scope.formData.tranDate),
