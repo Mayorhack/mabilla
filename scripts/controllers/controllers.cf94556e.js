@@ -1538,6 +1538,7 @@
             desc: scope.formData.desc,
             name: scope.formData.name,
             allowOveride: scope.formData.allowOveride ? "Y" : "S",
+            fileUploadType: scope.formData.name,
             validateStatus: validate ? "Y" : "S",
           },
         }).then(function (data) {
