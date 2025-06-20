@@ -39262,10 +39262,16 @@
           delete this.formData.recalculationRestFrequencyOnDayType;
           delete this.formData.recalculationRestFrequencyNthDayType;
         }
+         let payload = {
+          ...this.formData,
+          transactionProcessingStrategyCode:
+            this.formData.transactionProcessingStrategyId ??
+            "mifos-standard-strategy",
+        };
 
         resourceFactory.loanProductResource.put(
           { loanProductId: routeParams.id },
-          this.formData,
+          payload,
           function (data) {
             location.path("/viewloanproduct/" + data.resourceId);
           }
