@@ -39171,7 +39171,7 @@
           interestType: scope.interestMethod,
           transactionProcessingStrategyId: scope.transactionProcessingStrategy,
           transactionProcessingStrategyCode:
-            scope.transactionProcessingStrategy,
+            scope.transactionProcessingStrategy || false,
           interestCalculationPeriodType: scope.interestCalcPeriod,
           inArrearsTolerance: scope.arrearsTolerance,
           repaymentEvery: scope.repaymentFrequency,
