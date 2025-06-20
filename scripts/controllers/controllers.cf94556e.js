@@ -24377,7 +24377,8 @@
         let payload = {
           ...this.formData,
           transactionProcessingStrategyCode:
-            this.formData.transactionProcessingStrategyId,
+            this.formData.transactionProcessingStrategyId ??
+            "mifos-standard-strategy",
         };
 
         delete payload.transactionProcessingStrategyId;
