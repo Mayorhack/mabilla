@@ -39170,6 +39170,8 @@
           amortizationType: scope.amortization,
           interestType: scope.interestMethod,
           transactionProcessingStrategyId: scope.transactionProcessingStrategy,
+          transactionProcessingStrategyCode:
+            scope.transactionProcessingStrategy,
           interestCalculationPeriodType: scope.interestCalcPeriod,
           inArrearsTolerance: scope.arrearsTolerance,
           repaymentEvery: scope.repaymentFrequency,
@@ -39262,7 +39264,7 @@
           delete this.formData.recalculationRestFrequencyOnDayType;
           delete this.formData.recalculationRestFrequencyNthDayType;
         }
-         let payload = {
+        let payload = {
           ...this.formData,
           transactionProcessingStrategyCode:
             this.formData.transactionProcessingStrategyId ??
