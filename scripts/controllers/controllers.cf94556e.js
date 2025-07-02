@@ -1531,13 +1531,18 @@
         }
 
         Upload.upload({
-          url: $rootScope.hostUrl + API_VERSION + "/tellerposting/upload",
+          url:
+            $rootScope.hostUrl +
+            API_VERSION +
+            "/tellerposting/upload?fileUploadType=" +
+            scope.formData.name,
           data: {
             file: scope.formData.file,
             tranDate: formatDate(scope.formData.tranDate),
             desc: scope.formData.desc,
             name: scope.formData.name,
             allowOveride: scope.formData.allowOveride ? "Y" : "S",
+            fileUploadType: scope.formData.name,
             validateStatus: validate ? "Y" : "S",
           },
         }).then(function (data) {
@@ -24524,7 +24529,8 @@
         let payload = {
           ...this.formData,
           transactionProcessingStrategyCode:
-            this.formData.transactionProcessingStrategyId,
+            this.formData.transactionProcessingStrategyId ??
+            "mifos-standard-strategy",
         };
 
         delete payload.transactionProcessingStrategyId;
@@ -39319,6 +39325,8 @@
           amortizationType: scope.amortization,
           interestType: scope.interestMethod,
           transactionProcessingStrategyId: scope.transactionProcessingStrategy,
+          transactionProcessingStrategyCode:
+            scope.transactionProcessingStrategy || false,
           interestCalculationPeriodType: scope.interestCalcPeriod,
           inArrearsTolerance: scope.arrearsTolerance,
           repaymentEvery: scope.repaymentFrequency,
@@ -39411,10 +39419,16 @@
           delete this.formData.recalculationRestFrequencyOnDayType;
           delete this.formData.recalculationRestFrequencyNthDayType;
         }
+        let payload = {
+          ...this.formData,
+          transactionProcessingStrategyCode:
+            this.formData.transactionProcessingStrategyId ??
+            "mifos-standard-strategy",
+        };
 
         resourceFactory.loanProductResource.put(
           { loanProductId: routeParams.id },
-          this.formData,
+          payload,
           function (data) {
             location.path("/viewloanproduct/" + data.resourceId);
           }
