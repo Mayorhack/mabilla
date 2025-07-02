@@ -29,6 +29,9 @@
         templateUrl:
           "views/organization/bulkimport/bulkimporttellerposting.html",
       })
+      .when("/eod", {
+        templateUrl: "views/accounting/eod.html",
+      })
       .when("/viewstandinginstruction/:instructionId", {
         templateUrl: "views/accounttransfers/view_standinginstruction.html",
       })

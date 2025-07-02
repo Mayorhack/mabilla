@@ -1879,6 +1879,158 @@
 })(mifosX.controllers || {});
 (function (module) {
   mifosX.controllers = _.extend(module, {
+    EODController: function (
+      scope,
+      $rootScope,
+      translate,
+      resourceFactory,
+      location,
+      anchorScroll,
+      $uibModal
+    ) {
+      $rootScope.tempNodeID = -100; // variable used to store nodeID (from directive), so it(nodeID) is available for detail-table
+      scope.errorMsg = "";
+      scope.coadata = [];
+      scope.isTreeView = false;
+      today = `${new Date().getFullYear()}-${
+        new Date().getMonth() + 1
+      }-${new Date().getDate()}`;
+      scope.formData = {};
+      scope.activityCodes = [
+        { name: "Run Local Accrual", code: "RUN_LOAN_ACCRUAL" },
+        { name: "Run FD INT Income", code: "RUN_FD_INT_INCOME" },
+        { name: "Run Daily Balance", code: " RUN_DAILY_BAL" },
+      ];
+      resourceFactory.getLookupResource.get(
+        { categoryCode: "EOD_ACTIVITY_CODES" },
+        function (data) {
+          scope.activityCodes = data.listData;
+        }
+      );
+
+      scope.routeTo = function (id) {
+        location.path("/viewglaccount/" + id);
+      };
+      var SuccessModalInstanceCtrl = function ($scope, $uibModalInstance) {
+        $scope.close = function () {
+          $uibModalInstance.close("activate");
+        };
+        $scope.cancel = function () {
+          $uibModalInstance.dismiss("cancel");
+        };
+      };
+      formatDate = function (date) {
+        if (!date) return "";
+
+        let year = date.getFullYear();
+        let month = (date.getMonth() + 1).toString().padStart(2, "0");
+        let day = date.getDate().toString().padStart(2, "0");
+
+        // Format as YYYY-MM-DD
+        return `${day}-${month}-${year}`;
+      };
+      scope.scrollto = function (link) {
+        location.hash(link);
+        anchorScroll();
+      };
+
+      if (!scope.searchCriteria.acoa) {
+        scope.searchCriteria.acoa = null;
+        scope.saveSC();
+      }
+      runEod = function () {
+        resourceFactory.runEodResource.run(
+          {
+            activityCode: scope.formData.activityCode,
+            remarks: scope.formData.remarks,
+            eodDate: formatDate(scope.formData.eODDate),
+          },
+          function (data) {
+            if (data.responseCode === "000")
+              $uibModal.open({
+                templateUrl: "success.html",
+                controller: SuccessModalInstanceCtrl,
+              });
+            else {
+              scope.errorMsg = data.responseMessage;
+            }
+          }
+        );
+      };
+
+      scope.onRun = function () {
+        // scope.searchCriteria.acoa = scope.filterText || "";
+        // scope.saveSC();
+        // getAll();
+        runEod();
+      };
+      scope.open = function (refNo, status) {
+        scope.formData.refNo = refNo;
+        scope.formData.status = status;
+        $uibModal.open({
+          templateUrl: "otp.html",
+          controller: ModalInstanceCtrl,
+        });
+      };
+
+      scope.ChartsPerPage = 15;
+
+      // scope.$on('$viewContentLoaded', function() {
+      //   scope.onFilter();
+      // });
+
+      // scope.onFilter = function () {
+      //   getAll();
+      // };
+
+      getAll = function (pageNumber) {
+        resourceFactory.fetchEodResource.fetch(
+          {
+            endTime:
+              this.formatDate(scope.formData.endTime) ||
+              this.formatDate(new Date()),
+            startTime: scope.formData?.startTime
+              ? this.formatDate(scope.formData.startTime)
+              : "01-01-2024",
+            pageIndex: pageNumber || 0,
+            pageSize: scope.ChartsPerPage,
+            activityCode: scope.formData.activityCode,
+          },
+          function (data) {
+            if (data.responseCode === "000") {
+              scope.coadatas = data.data;
+              // scope.totalContracts = data.body.totalCount;
+            } else {
+              scope.errorMsg = data.responseMessage;
+            }
+          }
+        );
+      };
+      scope.getResultsPage = function (pageNumber) {
+        getAll(pageNumber - 1);
+      };
+      scope.onFilter = function () {
+        getAll();
+      };
+    },
+  });
+  mifosX.ng.application
+    .controller("EODController", [
+      "$scope",
+      "$rootScope",
+      "$translate",
+      "ResourceFactory",
+      "$location",
+      "$anchorScroll",
+      "$uibModal",
+      mifosX.controllers.EODController,
+    ])
+    .run(function ($log) {
+      $log.info("EODController initialized");
+    });
+})(mifosX.controllers || {});
+(function (module) {
+  mifosX.controllers = _.extend(module, {
     EditFinancialActivityMappingController: function (
       scope,
       resourceFactory,
@@ -26896,6 +27048,9 @@
             location.path("/home");
         }
       };
+      resourceFactory.fetchBusinessDateResource.get({}, function (data) {
+        scope.date = data.businessDate;
+      });
     },
   });
   mifosX.ng.application
