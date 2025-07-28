@@ -753,9 +753,9 @@
 
       scope.submit = function () {
         var jeTransaction = new Object();
-        var reqDate = dateFilter(scope.first.date, scope.df);
+        var reqDate = dateFilter(scope.first.date, "dd-MM-yyyy");
         jeTransaction.locale = scope.optlang.code;
-        jeTransaction.dateFormat = scope.df;
+        jeTransaction.dateFormat = "dd-MM-yyyy";
         jeTransaction.officeId = this.formData.officeId;
         jeTransaction.transactionDate = reqDate;
         jeTransaction.referenceNumber = this.formData.referenceNumber;
@@ -1376,6 +1376,7 @@
       scope.fileTypes = [];
       scope.first.templateUrl = "../../../images/bulktellerTemp.csv";
       scope.formData = {};
+
       var requestParams = { staffInSelectedOfficeOnly: true };
 
       resourceFactory.clientTemplateResource.get(
@@ -1431,7 +1432,7 @@
           url:
             $rootScope.hostUrl +
             API_VERSION +
-            `/tellerposting/upload?fileUploadType=${formData.fileType}`,
+            `/tellerposting/upload?fileUploadType=${scope.formData.fileType}`,
           data: {
             file: scope.formData.file,
             // locale: scope.optlang.code,
@@ -1440,6 +1441,9 @@
           },
         }).then(function (data) {
           location.path("/viewtellers/" + data.resourceId);
+          console.log(data);
+
+          scope.errorMsg = data;
           // to fix IE not refreshing the model
           if (!scope.$$phase) {
             scope.$apply();
@@ -1460,6 +1464,152 @@
     ])
     .run(function ($log) {
       $log.info("BulkImportTellerPostingController initialized");
+    });
+})(mifosX.controllers || {});
+(function (module) {
+  mifosX.controllers = _.extend(module, {
+    BulkImportTellerController: function (
+      scope,
+      resourceFactory,
+      location,
+      API_VERSION,
+      $rootScope,
+      Upload,
+      $uibModal
+    ) {
+      scope.first = {};
+      scope.response = "";
+      scope.coadatas = [];
+      scope.responseMessage = "";
+      scope.totalContracts = 0;
+      scope.batchNo = "";
+      scope.first.templateUrl =
+        API_VERSION +
+        "/offices/downloadtemplate" +
+        "?tenantIdentifier=" +
+        $rootScope.tenantIdentifier +
+        "&locale=" +
+        scope.optlang.code +
+        "&dateFormat=" +
+        scope.df;
+
+      scope.formData = {};
+      scope.onFileSelect = function (files) {
+        scope.formData.file = files[0];
+      };
+      const SuccessModalInstanceCtrl = function (
+        $scope,
+        $uibModalInstance,
+        responseMessage
+      ) {
+        $scope.responseMessage = responseMessage.replaceAll("<br/>", "\n");
+        $scope.close = function () {
+          $uibModalInstance.close("activate");
+        };
+        $scope.cancel = function () {
+          $uibModalInstance.dismiss("cancel");
+        };
+      };
+      formatDate = function (date) {
+        if (!date) return "";
+
+        let year = date.getFullYear();
+        let month = (date.getMonth() + 1).toString().padStart(2, "0");
+        let day = date.getDate().toString().padStart(2, "0");
+
+        return `${day}-${month}-${year}`;
+      };
+      resourceFactory.getLookupResource.get(
+        { categoryCode: "FILE_UPLOAD_TYPE" },
+        function (data) {
+          scope.names = data.listData;
+        }
+      );
+      scope.upload = function (validate) {
+        if (!scope.formData.file) {
+          scope.errorMsg = "Please upload a file";
+        }
+
+        Upload.upload({
+          url:
+            $rootScope.hostUrl +
+            API_VERSION +
+            "/tellerposting/upload?fileUploadType=" +
+            scope.formData.name,
+          data: {
+            file: scope.formData.file,
+            tranDate: formatDate(scope.formData.tranDate),
+            desc: scope.formData.desc,
+            name: scope.formData.name,
+            allowOveride: scope.formData.allowOveride ? "Y" : "S",
+            fileUploadType: scope.formData.name,
+            validateStatus: validate ? "Y" : "S",
+          },
+        }).then(function (data) {
+          if (data.data.responseCode) {
+            validate
+              ? null
+              : $uibModal.open({
+                  templateUrl: "success.html",
+                  controller: SuccessModalInstanceCtrl,
+                });
+
+            scope.response = data.data.responseMessage.replaceAll(
+              "<br/>",
+              "\n"
+            );
+            scope.coadatas = data.data.data;
+            scope.totalContracts = data.data.data.length;
+          } else {
+            scope.errorMsg = data.data.responseMessage;
+          }
+        });
+      };
+      scope.validateStatus = function () {
+        if (!scope.batchNo) {
+          return;
+        }
+        resourceFactory.validateBatchStatus.get(
+          { batchNo: scope.batchNo },
+          function (data) {
+            if (data.responseCode == "00" || data.responseCode == "000") {
+              scope.responseMessage = data.responseMessage;
+              console.log(scope.responseMessage);
+
+              $uibModal.open({
+                templateUrl: "success.html",
+                controller: SuccessModalInstanceCtrl,
+                resolve: {
+                  responseMessage: function () {
+                    return data.responseMessage;
+                  },
+                },
+              });
+            } else {
+              scope.batchNo = "";
+              scope.errorMsg = data.responseMessage;
+            }
+          }
+        );
+      };
+      scope.close = function () {
+        scope.errorMsg = "";
+      };
+    },
+  });
+  mifosX.ng.application
+    .controller("BulkImportTellerController", [
+      "$scope",
+      "ResourceFactory",
+      "$location",
+      "API_VERSION",
+      "$rootScope",
+      "Upload",
+      "$uibModal",
+      mifosX.controllers.BulkImportTellerController,
+    ])
+    .run(function ($log) {
+      $log.info("BulkImportTellerController initialized");
     });
 })(mifosX.controllers || {});
 (function (module) {
@@ -1730,6 +1880,158 @@
     ])
     .run(function ($log) {
       $log.info("DefineOpeningBalancesController initialized");
+    });
+})(mifosX.controllers || {});
+(function (module) {
+  mifosX.controllers = _.extend(module, {
+    EODController: function (
+      scope,
+      $rootScope,
+      translate,
+      resourceFactory,
+      location,
+      anchorScroll,
+      $uibModal
+    ) {
+      $rootScope.tempNodeID = -100; // variable used to store nodeID (from directive), so it(nodeID) is available for detail-table
+      scope.errorMsg = "";
+      scope.coadata = [];
+      scope.isTreeView = false;
+      today = `${new Date().getFullYear()}-${
+        new Date().getMonth() + 1
+      }-${new Date().getDate()}`;
+      scope.formData = {};
+      scope.activityCodes = [
+        { name: "Run Local Accrual", code: "RUN_LOAN_ACCRUAL" },
+        { name: "Run FD INT Income", code: "RUN_FD_INT_INCOME" },
+        { name: "Run Daily Balance", code: " RUN_DAILY_BAL" },
+      ];
+      resourceFactory.getLookupResource.get(
+        { categoryCode: "EOD_ACTIVITY_CODES" },
+        function (data) {
+          scope.activityCodes = data.listData;
+        }
+      );
+
+      scope.routeTo = function (id) {
+        location.path("/viewglaccount/" + id);
+      };
+      var SuccessModalInstanceCtrl = function ($scope, $uibModalInstance) {
+        $scope.close = function () {
+          $uibModalInstance.close("activate");
+        };
+        $scope.cancel = function () {
+          $uibModalInstance.dismiss("cancel");
+        };
+      };
+      formatDate = function (date) {
+        if (!date) return "";
+
+        let year = date.getFullYear();
+        let month = (date.getMonth() + 1).toString().padStart(2, "0");
+        let day = date.getDate().toString().padStart(2, "0");
+
+        // Format as YYYY-MM-DD
+        return `${day}-${month}-${year}`;
+      };
+      scope.scrollto = function (link) {
+        location.hash(link);
+        anchorScroll();
+      };
+
+      if (!scope.searchCriteria.acoa) {
+        scope.searchCriteria.acoa = null;
+        scope.saveSC();
+      }
+      runEod = function () {
+        resourceFactory.runEodResource.run(
+          {
+            activityCode: scope.formData.activityCode,
+            remarks: scope.formData.remarks,
+            eodDate: formatDate(scope.formData.eODDate),
+          },
+          function (data) {
+            if (data.responseCode === "000")
+              $uibModal.open({
+                templateUrl: "success.html",
+                controller: SuccessModalInstanceCtrl,
+              });
+            else {
+              scope.errorMsg = data.responseMessage;
+            }
+          }
+        );
+      };
+
+      scope.onRun = function () {
+        // scope.searchCriteria.acoa = scope.filterText || "";
+        // scope.saveSC();
+        // getAll();
+        runEod();
+      };
+      scope.open = function (refNo, status) {
+        scope.formData.refNo = refNo;
+        scope.formData.status = status;
+        $uibModal.open({
+          templateUrl: "otp.html",
+          controller: ModalInstanceCtrl,
+        });
+      };
+
+      scope.ChartsPerPage = 15;
+
+      // scope.$on('$viewContentLoaded', function() {
+      //   scope.onFilter();
+      // });
+
+      // scope.onFilter = function () {
+      //   getAll();
+      // };
+
+      getAll = function (pageNumber) {
+        resourceFactory.fetchEodResource.fetch(
+          {
+            endTime:
+              this.formatDate(scope.formData.endTime) ||
+              this.formatDate(new Date()),
+            startTime: scope.formData?.startTime
+              ? this.formatDate(scope.formData.startTime)
+              : "01-01-2024",
+            pageIndex: pageNumber || 0,
+            pageSize: scope.ChartsPerPage,
+            activityCode: scope.formData.activityCode,
+          },
+          function (data) {
+            if (data.responseCode === "000") {
+              scope.coadatas = data.data;
+              // scope.totalContracts = data.body.totalCount;
+            } else {
+              scope.errorMsg = data.responseMessage;
+            }
+          }
+        );
+      };
+      scope.getResultsPage = function (pageNumber) {
+        getAll(pageNumber - 1);
+      };
+      scope.onFilter = function () {
+        getAll();
+      };
+    },
+  });
+  mifosX.ng.application
+    .controller("EODController", [
+      "$scope",
+      "$rootScope",
+      "$translate",
+      "ResourceFactory",
+      "$location",
+      "$anchorScroll",
+      "$uibModal",
+      mifosX.controllers.EODController,
+    ])
+    .run(function ($log) {
+      $log.info("EODController initialized");
     });
 })(mifosX.controllers || {});
 (function (module) {
@@ -2505,17 +2807,26 @@
       };
 
       scope.ChartsPerPage = 15;
-      resourceFactory.tellerPostingResource.getAllAccountCoas(
-        {
-          endDate: today,
-          startDate: this.formData?.startDate
-            ? this.formData.startDate
-            : "01-01-2023",
-        },
-        function (data) {
-          scope.coadatas = data.transactionResponseList;
-        }
-      );
+      getAll = function (pageNumber) {
+        resourceFactory.tellerPostingResource.getAllAccountCoas(
+          {
+            endDate: today,
+            startDate: this.formData?.startDate
+              ? this.formData.startDate
+              : "01-01-2025",
+            pageSize: scope.ChartsPerPage,
+            pageNumber: pageNumber || 1,
+          },
+          function (data) {
+            scope.coadatas = data.transactionResponseList;
+            scope.totalPosting = data.totalCount;
+          }
+        );
+      };
+      scope.getResultsPage = function (pageNumber) {
+        getAll(pageNumber);
+      };
+      getAll();
     },
   });
   mifosX.ng.application
@@ -24218,7 +24529,8 @@
         let payload = {
           ...this.formData,
           transactionProcessingStrategyCode:
-            this.formData.transactionProcessingStrategyId,
+            this.formData.transactionProcessingStrategyId ??
+            "mifos-standard-strategy",
         };
 
         delete payload.transactionProcessingStrategyId;
@@ -25677,25 +25989,21 @@
           scope.loandetails.clientId != null &&
           scope.loandetails.clientId != ""
         ) {
-          location
-            .path("/viewtransactions/" + transactionId)
-            .search({
-              productName: scope.loandetails.loanProductName,
-              loanId: scope.loandetails.id,
-              clientId: scope.loandetails.clientId,
-              accountNo: scope.loandetails.accountNo,
-              clientName: scope.loandetails.clientName,
-            });
+          location.path("/viewtransactions/" + transactionId).search({
+            productName: scope.loandetails.loanProductName,
+            loanId: scope.loandetails.id,
+            clientId: scope.loandetails.clientId,
+            accountNo: scope.loandetails.accountNo,
+            clientName: scope.loandetails.clientName,
+          });
         } else {
-          location
-            .path("/viewtransactions/" + transactionId)
-            .search({
-              productName: scope.loandetails.loanProductName,
-              loanId: scope.loandetails.id,
-              accountNo: scope.loandetails.accountNo,
-              groupId: scope.loandetails.group.id,
-              groupName: scope.loandetails.group.name,
-            });
+          location.path("/viewtransactions/" + transactionId).search({
+            productName: scope.loandetails.loanProductName,
+            loanId: scope.loandetails.id,
+            accountNo: scope.loandetails.accountNo,
+            groupId: scope.loandetails.group.id,
+            groupName: scope.loandetails.group.name,
+          });
         }
       };
 
@@ -26746,6 +27054,9 @@
             location.path("/home");
         }
       };
+      resourceFactory.fetchBusinessDateResource.get({}, function (data) {
+        scope.date = data.businessDate;
+      });
     },
   });
   mifosX.ng.application
@@ -27032,8 +27343,8 @@
           scope.dateformat =
             localStorageService.getFromLocalStorage("dateformat");
         } else {
-          localStorageService.addToLocalStorage("dateformat", "dd MMMM yyyy");
-          scope.dateformat = "dd MMMM yyyy";
+          localStorageService.addToLocalStorage("dateformat", "dd-MM-yyyy");
+          scope.dateformat = "dd-MM-yyyy";
         }
         scope.df = scope.dateformat;
         scope.dft = scope.dateformat + " " + "HH:mm:ss";
@@ -27110,7 +27421,6 @@
 
       // Log out the user when the window/tab is closed.
       window.onunload = function () {
-        scope.logout();
         $idle.unwatch();
         scope.started = false;
       };
@@ -39015,6 +39325,8 @@
           amortizationType: scope.amortization,
           interestType: scope.interestMethod,
           transactionProcessingStrategyId: scope.transactionProcessingStrategy,
+          transactionProcessingStrategyCode:
+            scope.transactionProcessingStrategy || false,
           interestCalculationPeriodType: scope.interestCalcPeriod,
           inArrearsTolerance: scope.arrearsTolerance,
           repaymentEvery: scope.repaymentFrequency,
@@ -39107,10 +39419,16 @@
           delete this.formData.recalculationRestFrequencyOnDayType;
           delete this.formData.recalculationRestFrequencyNthDayType;
         }
+        let payload = {
+          ...this.formData,
+          transactionProcessingStrategyCode:
+            this.formData.transactionProcessingStrategyId ??
+            "mifos-standard-strategy",
+        };
 
         resourceFactory.loanProductResource.put(
           { loanProductId: routeParams.id },
-          this.formData,
+          payload,
           function (data) {
             location.path("/viewloanproduct/" + data.resourceId);
           }
@@ -42283,7 +42601,47 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = "Report.xlsx";
+            a.download = scope.formData.reportSource + ".xlsx";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          });
+      };
+      scope.downloadReportLink = function () {
+        const url = window.location.search;
+        const queryParams = new URLSearchParams(url);
+        const tenant = queryParams.get("tenantIdentifier");
+        const baseUrl = queryParams.get("baseApiUrl");
+        const params = new URLSearchParams({
+          reportCode: scope.reportId,
+          ...scope.formData,
+        });
+        var myHeaders = new Headers();
+        var auth = JSON.parse(
+          localStorage.getItem("sessionData")
+        ).authenticationKey;
+        myHeaders.append("Authorization", `Basic ${auth}`);
+        myHeaders.append("Fineract-Platform-Tenantid", tenant);
+
+        var requestOptions = {
+          method: "GET",
+
+          headers: myHeaders,
+          redirect: "follow",
+        };
+        fetch(
+          baseUrl +
+            "/fineract-provider/api/v1" +
+            "/thirdparty/downloadReportLink?" +
+            params,
+          requestOptions
+        )
+          .then((response) => response.json())
+          .then((blob) => {
+            const url = blob;
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = scope.formData.reportSource + ".xlsx";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -46101,11 +46459,13 @@
     ) {
       scope.action = routeParams.action || "";
       scope.accountId = routeParams.id;
+      scope.allGls = [];
       scope.savingAccountId = routeParams.id;
       scope.formData = {};
       scope.entityformData = {};
       scope.entityformData.datatables = {};
       scope.restrictDate = new Date();
+      scope.actionFailed = false;
       // Transaction UI Related
       scope.isTransaction = false;
       scope.transactionAmountField = false;
@@ -46190,7 +46550,9 @@
           }
         );
       };
-
+      scope.closeError = function () {
+        scope.actionFailed = false;
+      };
       scope.fetchEntities = function (entity, status, productId) {
         if (!productId) {
           resourceFactory.savingsResource.get(
@@ -46295,6 +46657,74 @@
           scope.taskPermissionName = "ACTIVATE_SAVINGSACCOUNT";
           scope.fetchEntities("m_savings_account", "ACTIVATE");
           break;
+        case "holdamount":
+          resourceFactory.savingsTrxnsTemplateResource.get(
+            { savingsId: scope.accountId },
+            function (data) {
+              scope.accountNo = data.accountNo;
+            }
+          );
+          scope.title = "Hold Amount";
+          scope.labelName = "label.input.transactiondate";
+          scope.modelName = "transactionDate";
+          scope.showDateField = true;
+          scope.showNoteField = true;
+          scope.showTAmountField = true;
+
+          scope.showOtp = true;
+          //   scope.transactionAmountField = true;
+          //   scope.isTransaction = true;
+          scope.showPaymentDetails = false;
+          scope.taskPermissionName = "DEPOSIT_SAVINGSACCOUNT";
+          break;
+        case "overdraft":
+          resourceFactory.savingsTrxnsTemplateResource.get(
+            { savingsId: scope.accountId },
+            function (data) {
+              scope.accountNo = data.accountNo;
+            }
+          );
+          scope.title = "Over Draft";
+          scope.showTAmountField = true;
+          scope.showOtp = true;
+          //   scope.transactionAmountField = true;
+          //   scope.isTransaction = true;
+          scope.showPaymentDetails = false;
+          scope.taskPermissionName = "DEPOSIT_SAVINGSACCOUNT";
+          break;
+        case "removeoverdraft":
+          resourceFactory.savingsTrxnsTemplateResource.get(
+            { savingsId: scope.accountId },
+            function (data) {
+              scope.accountNo = data.accountNo;
+            }
+          );
+          scope.title = "Remove Over Draft";
+          scope.showTAmountField = false;
+          scope.showOtp = true;
+          //   scope.transactionAmountField = true;
+          //   scope.isTransaction = true;
+          scope.showPaymentDetails = false;
+          scope.taskPermissionName = "DEPOSIT_SAVINGSACCOUNT";
+          break;
+        case "unhold":
+          resourceFactory.savingsTrxnsTemplateResource.get(
+            { savingsId: scope.accountId },
+            function (data) {
+              scope.accountNo = data.accountNo;
+            }
+          );
+          scope.title = "UnHold Amount";
+          scope.labelName = "label.input.transactiondate";
+          scope.modelName = "transactionDate";
+          scope.showDateField = true;
+          scope.showNoteField = true;
+          scope.showTAmountField = true;
+          //   scope.transactionAmountField = true;
+          //   scope.isTransaction = true;
+          scope.showPaymentDetails = false;
+          scope.taskPermissionName = "DEPOSIT_SAVINGSACCOUNT";
+          break;
         case "deposit":
           resourceFactory.savingsTrxnsTemplateResource.get(
             { savingsId: scope.accountId },
@@ -46309,6 +46739,7 @@
           scope.showNoteField = true;
           scope.isTransaction = true;
           scope.transactionAmountField = true;
+          scope.showGlCode = true;
           scope.showPaymentDetails = false;
           scope.taskPermissionName = "DEPOSIT_SAVINGSACCOUNT";
           break;
@@ -46336,6 +46767,7 @@
           scope.labelName = "label.input.transactiondate";
           scope.modelName = "transactionDate";
           scope.showDateField = true;
+          scope.showGlCode = true;
           scope.showNoteField = true;
           scope.isTransaction = true;
           scope.transactionAmountField = true;
@@ -46498,6 +46930,12 @@
       scope.cancel = function () {
         location.path("/viewsavingaccount/" + routeParams.id);
       };
+      resourceFactory.accountCoaResource.getAllAccountCoas(
+        { manualEntriesAllowed: true },
+        function (data) {
+          scope.allGls = data;
+        }
+      );
 
       scope.submit = function () {
         var params = { command: scope.action };
@@ -46517,6 +46955,10 @@
                 this.formData.transactionDate,
                 scope.df
               );
+              this.formData.tranCode = "CSWD";
+              this.formData.extRefNo = new Date().getTime();
+              this.formData.narration = this.formData.note;
+              this.formData.postGlEntry = "Y";
             }
           } else if (scope.action == "deposit") {
             if (this.formData.transactionDate) {
@@ -46524,6 +46966,10 @@
                 this.formData.transactionDate,
                 scope.df
               );
+              this.formData.tranCode = "CSDP";
+              this.formData.extRefNo = new Date().getTime();
+              this.formData.narration = this.formData.note;
+              this.formData.postGlEntry = "Y";
             }
           }
           if (scope.action == "modifytransaction") {
@@ -46614,6 +47060,79 @@
             this.formData,
             function (data) {
               location.path("/viewsavingaccount/" + data.savingsId);
+            }
+          );
+        } else if (scope.action == "holdamount") {
+          this.formData.accountNo = scope.accountNo;
+          this.formData.reason = this.formData.note;
+          this.formData.transactionDate = dateFilter(
+            this.formData.transactionDate,
+            "dd-MM-yyyy"
+          );
+          resourceFactory.acctMaintenanceHold.hold(
+            {},
+            this.formData,
+            function (data) {
+              if (data.responseCode !== "000") {
+                scope.actionFailed = true;
+                scope.errorMessage = data.responseMessage;
+                return;
+              }
+              location.path("/viewsavingaccount/" + scope.accountId);
+            }
+          );
+        } else if (scope.action == "unholdamount") {
+          this.formData.accountNo = scope.accountNo;
+          this.formData.reason = this.formData.note;
+
+          resourceFactory.acctMaintenance.hold(
+            {},
+            this.formData,
+            function (data) {
+              if (data.responseCode !== "00" || data.responseCode !== "000") {
+                scope.actionFailed = true;
+                scope.errorMessage = data.responseMessage;
+              }
+              // location.path("/viewsavingaccount/" + data.savingsId);
+            }
+          );
+        } else if (scope.action == "overdraft") {
+          this.formData.accountNo = scope.accountNo;
+          this.formData.overDraft = "ALLOW";
+          resourceFactory.acctMaintenanceOverDraft.overdraft(
+            {},
+            {
+              accountNo: scope.accountNo,
+              amount: this.formData.amount,
+              overDraft: "ALLOW",
+              otp: this.formData.otp,
+            },
+            function (data) {
+              if (data.responseCode !== "000") {
+                scope.actionFailed = true;
+                scope.errorMessage = data.responseMessage;
+                return;
+              }
+              location.path("/viewsavingaccount/" + scope.accountId);
+            }
+          );
+        } else if (scope.action == "removeoverdraft") {
+          this.formData.accountNo = scope.accountNo;
+          this.formData.overDraft = "REJECT";
+          resourceFactory.acctMaintenanceOverDraft.overdraft(
+            {},
+            {
+              accountNo: scope.accountNo,
+              overDraft: "REJECT",
+              otp: this.formData.otp,
+            },
+            function (data) {
+              if (data.responseCode !== "000") {
+                scope.actionFailed = true;
+                scope.errorMessage = data.responseMessage;
+                return;
+              }
+              location.path("/viewsavingaccount/" + scope.accountId);
             }
           );
         } else {

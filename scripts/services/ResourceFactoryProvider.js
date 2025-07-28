@@ -5,7 +5,11 @@
         apiVer = "/fineract-provider/api/v1",
         tenantIdentifier = "";
       this.setBaseUrl = function (url) {
-        baseUrl = url;
+        if (url === "https://coreweb.slsbank.com") {
+          baseUrl === "https://mifos-backend.slsbank.com";
+        } else {
+          baseUrl = url;
+        }
         console.log(baseUrl);
       };
 
@@ -88,6 +92,29 @@
               {},
               {
                 getImports: { method: "GET", params: {}, isArray: true },
+              }
+            ),
+            // glCodeResource: defineResource(
+            //   apiVer + "/lookup-data?categoryCode=GL_CODES",
+            //   // { officeId: "@officeId" },
+            //   {
+            //     getGlCodes: { method: "GET", params: {}, isArray: true },
+            //     getGlCodesInAlphabeticalOrder: {
+            //       method: "GET",
+            //       params: { orderBy: "name", sortOrder: "ASC" },
+            //       isArray: true,
+            //     },
+            //     update: { method: "PUT" },
+            //   }
+            // ),
+            documentDownloadResource: defineResource(
+              apiVer + "/filelocation/fetch",
+              {},
+              {
+                getAllDocuments: {
+                  method: "GET",
+                  params: { limit: 1000 },
+                },
               }
             ),
             clientResource: defineResource(
@@ -586,6 +613,15 @@
                 update: { method: "PUT" },
               }
             ),
+            repaymentScheduleDownloadResource: defineResource(
+              apiVer + "/loans/repaymentschedule/downloads/:loanId",
+              {
+                loanId: "@loanId",
+              },
+              {
+                download: { method: "GET", params: {} },
+              }
+            ),
             glimLoan: defineResource(
               apiVer + "/loans/glimAccount/:glimId",
               { glimId: "@glimId", command: "@command" },
@@ -627,6 +663,24 @@
               {},
               {
                 get: { method: "GET", params: {} },
+                update: { method: "PUT" },
+                upd: { method: "PUT", params: {} },
+              }
+            ),
+            glCodeResource: defineResource(
+              apiVer + "/lookup-data?categoryCode=GL_CODES",
+              {},
+              {
+                getGlCodes: { method: "GET", params: {} },
+                update: { method: "PUT" },
+                upd: { method: "PUT", params: {} },
+              }
+            ),
+            saveGlCodeResource: defineResource(
+              apiVer + "/v1/glpm/save",
+              {},
+              {
+                save: { method: "POST", params: {} },
                 update: { method: "PUT" },
                 upd: { method: "PUT", params: {} },
               }
@@ -787,26 +841,11 @@
                 },
               }
             ),
-            getFileUploadType: defineResource(
-              apiVer + "/tellerposting/lookup-data",
-              { glAccountId: "@glAccountId" },
-              {
-                get: {
-                  method: "GET",
-                  params: { categoryCode: "FILE_UPLOAD_TYPE" },
-                },
-              }
-            ),
             downloadReport: defineResource(
               apiVer + "/thirdparty/downloadReport",
               { glAccountId: "@glAccountId" },
               {
-                get: {
-                  method: "GET",
-                  params: {},
-
-                  responseType: "blob",
-                },
+                get: { method: "GET", params: {} },
               }
             ),
             accountLookupResource: defineResource(
@@ -814,6 +853,145 @@
               { glAccountId: "@glAccountId" },
               {
                 get: { method: "POST" },
+              }
+            ),
+            getGLCodesResource: defineResource(
+              apiVer + "/tellerposting/lookup-data?categoryCode=GL_CODES",
+              {},
+              {
+                get: { method: "GET" },
+              }
+            ),
+            getLookupResource: defineResource(
+              apiVer + "/tellerposting/lookup-data",
+              {},
+              {
+                get: { method: "GET" },
+              }
+            ),
+            validateBatchStatus: defineResource(
+              apiVer + "/tellerposting/fetchUploadStatus",
+              {},
+              {
+                get: { method: "GET" },
+              }
+            ),
+            fixedAssetResource: defineResource(
+              apiVer + "/fixedassets",
+              {},
+              {
+                getAllFixedAssets: {
+                  method: "GET",
+                  isArray: true,
+                },
+              }
+            ),
+            AfixedAssetResource: defineResource(
+              apiVer + "/fixedassets/:id",
+              {},
+              {
+                getAFixedAsset: {
+                  method: "GET",
+                },
+              }
+            ),
+            createFixedAssetResource: defineResource(
+              apiVer + "/fixedassets/create",
+              {},
+              {
+                create: { method: "POST" },
+              }
+            ),
+
+            contractMasterResource: defineResource(
+              apiVer + "/contracts/fetch",
+              {},
+              {
+                getAllContracts: {
+                  method: "POST",
+                },
+              }
+            ),
+            bookContractResource: defineResource(
+              apiVer + "/contracts/contract-master/book",
+              {},
+              {
+                create: { method: "POST" },
+              }
+            ),
+            undoContractResource: defineResource(
+              apiVer + "/contracts/undoContractBooking",
+              {},
+              {
+                undo: { method: "POST" },
+              }
+            ),
+            computeContractResource: defineResource(
+              apiVer + "/contracts/contract-master/compute",
+              {},
+              {
+                compute: { method: "POST" },
+              }
+            ),
+            closeContractResource: defineResource(
+              apiVer + "/contracts/close",
+              {},
+              {
+                close: { method: "POST" },
+              }
+            ),
+            loanMasterResource: defineResource(
+              apiVer + "/loans/",
+              {},
+              {
+                getAllLoans: {
+                  method: "GET",
+                },
+              }
+            ),
+            transMasterResource: defineResource(
+              apiVer + "/acctmaintenance/transaction",
+              {},
+              {
+                getAll: {
+                  method: "POST",
+                },
+              }
+            ),
+            runEodResource: defineResource(
+              apiVer + "/eod/run",
+              {},
+              {
+                run: {
+                  method: "POST",
+                },
+              }
+            ),
+            fetchBusinessDateResource: defineResource(
+              apiVer + "/eod/fetchBusinessDate",
+              {},
+              {
+                get: {
+                  method: "GET",
+                },
+              }
+            ),
+            fetchEodResource: defineResource(
+              apiVer + "/eod/fetch",
+              {},
+              {
+                fetch: {
+                  method: "POST",
+                },
+              }
+            ),
+            reverseTransResource: defineResource(
+              apiVer + "/tellerposting/reverseTran",
+              {},
+              {
+                reverse: {
+                  method: "POST",
+                },
               }
             ),
             journalEntriesResource: defineResource(
@@ -973,6 +1151,29 @@
                 get: { method: "GET", params: {} },
                 getAllNotes: { method: "GET", params: {}, isArray: true },
                 update: { method: "PUT" },
+              }
+            ),
+            acctMaintenanceHold: defineResource(
+              apiVer + "/acctmaintenance/hold",
+              {},
+              {
+                hold: { method: "POST", params: {} },
+
+                update: { method: "PUT" },
+              }
+            ),
+            acctMaintenanceUnhold: defineResource(
+              apiVer + "/acctmaintenance/unhold",
+              {},
+              {
+                unhold: { method: "POST", params: {} },
+              }
+            ),
+            acctMaintenanceOverDraft: defineResource(
+              apiVer + "/acctmaintenance/overdraft",
+              {},
+              {
+                overdraft: { method: "POST", params: {} },
               }
             ),
             gsimResource: defineResource(
@@ -1451,6 +1652,20 @@
                     tellerId: "@tellerId",
                     cashierId: "@cashierId",
                     command: "settle",
+                  },
+                },
+              }
+            ),
+            tellerCashierTxnsExpenseResource: defineResource(
+              apiVer + "/tellers/:tellerId/cashiers/:cashierId/expense",
+              { tellerId: "@tellerId", cashierId: "@cashierId" },
+              {
+                add: {
+                  method: "POST",
+                  params: {
+                    tellerId: "@tellerId",
+                    cashierId: "@cashierId",
+                    command: "expense",
                   },
                 },
               }

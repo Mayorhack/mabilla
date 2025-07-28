@@ -25,6 +25,13 @@
       .when("/editstandinginstruction/:instructionId/:from", {
         templateUrl: "views/accounttransfers/edit_standinginstruction.html",
       })
+      .when("/file-upload", {
+        templateUrl:
+          "views/organization/bulkimport/bulkimporttellerposting.html",
+      })
+      .when("/eod", {
+        templateUrl: "views/accounting/eod.html",
+      })
       .when("/viewstandinginstruction/:instructionId", {
         templateUrl: "views/accounttransfers/view_standinginstruction.html",
       })
@@ -1048,10 +1055,6 @@
         templateUrl:
           "views/organization/bulkimport/bulkimportloanrepayments.html",
       })
-      .when("/bulkimporttellerposting", {
-        templateUrl:
-          "views/organization/bulkimport/bulkimporttellerposting.html",
-      })
       .when("/bulkimportguarantor", {
         templateUrl: "views/organization/bulkimport/bulkimportguarantor.html",
       })
@@ -1074,6 +1077,10 @@
       .when("/bulkimportshareaccounts", {
         templateUrl:
           "views/organization/bulkimport/bulkimportshareaccounts.html",
+      })
+      .when("/bulkimporttellerposting", {
+        templateUrl:
+          "views/organization/bulkimport/bulkimporttellerposting.html",
       })
       .when("/bulkimportfixeddepositaccounts", {
         templateUrl:
